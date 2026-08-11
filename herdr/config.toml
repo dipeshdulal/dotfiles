@@ -1,0 +1,70 @@
+onboarding = false
+
+[ui]
+show_agent_labels_on_pane_borders = true
+pane_gaps = false   # panes sit flush (border only), no blank gutter between them
+
+[theme]
+name = "catppuccin"
+auto_switch = false
+
+[keys]
+# tmux-aligned bindings. Prefix stays ctrl+b (same as tmux).
+prefix = "ctrl+b"
+
+# Overrides where herdr's default differs from canonical tmux:
+detach = "prefix+d"            # tmux: prefix d   (herdr default was prefix+q)
+rename_tab = "prefix+comma"    # tmux: prefix ,   (herdr default was prefix+shift+t)
+close_tab = "prefix+ampersand" # tmux: prefix &   (herdr default was prefix+shift+x)
+
+# Direct ctrl+h/j/k/l is handled by the vim-herdr-navigation plugin
+# (see [[keys.command]] at the bottom) so it also drives nvim splits seamlessly.
+# Keep prefix+h/j/k/l as a fallback to step out of non-vim TUIs (lazygit, k9s...).
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+
+# herdr defaults that already match tmux (explicit for clarity):
+new_tab = "prefix+c"           # tmux: prefix c
+next_tab = "prefix+n"          # tmux: prefix n
+previous_tab = "prefix+p"      # tmux: prefix p
+switch_tab = "prefix+1..9"     # tmux: prefix 1..9
+zoom = "prefix+z"              # tmux: prefix z
+close_pane = "prefix+x"        # tmux: prefix x (kill pane)
+help = "prefix+?"              # tmux: prefix ?
+
+# splits: tmux %/" aren't bindable in herdr; use the literal pipe char
+split_vertical = "prefix+|"    # prefix + |  (tmux-plugin convention)
+split_horizontal = "prefix+minus"
+
+# Seamless ctrl+h/j/k/l across herdr panes AND nvim splits, via the
+# vim-herdr-navigation plugin. The action checks the focused pane's process:
+# if it's vim/nvim it forwards the key; otherwise it moves the herdr pane.
+[[keys.command]]
+key = "ctrl+h"
+type = "plugin_action"
+command = "vim-herdr-navigation.left"
+description = "navigate left (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+j"
+type = "plugin_action"
+command = "vim-herdr-navigation.down"
+description = "navigate down (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+k"
+type = "plugin_action"
+command = "vim-herdr-navigation.up"
+description = "navigate up (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+l"
+type = "plugin_action"
+command = "vim-herdr-navigation.right"
+description = "navigate right (vim/herdr)"
+
+[experimental]
+# Enable Kitty graphics protocol support for inline images in Herdr panes.
+kitty_graphics = true

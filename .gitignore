@@ -1,0 +1,25 @@
+# Credentials — never commit
+pi/agent/auth.json
+**/auth.json
+*.pem
+*.key
+
+# Machine-local pi state
+pi/agent/sessions/
+pi/agent/npm/node_modules/
+pi/agent/models-store.json
+pi/agent/models.json
+pi/agent/git/
+
+# herdr runtime state
+herdr/*.log
+herdr/*.sock
+herdr/session.json
+herdr/release-notes.json
+herdr/.plugins.lock
+
+# Backups install.sh makes
+*.bak
+*.pre-omlx
+
+.DS_Store
