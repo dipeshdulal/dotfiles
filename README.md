@@ -4,7 +4,7 @@ Neovim, pi, herdr, tmux and zsh configuration, symlinked into place by
 `install.sh`.
 
 ```bash
-git clone https://github.com/dipeshdulal/my-nvim-config ~/dotfiles
+git clone https://github.com/dipeshdulal/dotfiles ~/dotfiles
 cd ~/dotfiles && ./install.sh
 ```
 
