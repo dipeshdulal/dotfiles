@@ -5,7 +5,8 @@
     "@heyhuynhgiabuu/pi-diff": "^0.7.6",
     "@heyhuynhgiabuu/pi-pretty": "^0.6.21",
     "pi-claude-bridge": "^0.7.0",
-    "pi-web-access": "^0.19.0",
+    "pi-schedule-prompt": "^0.4.1",
+    "pi-web-access": "^0.21.0",
     "pi-zentui": "^0.18.1"
   }
 }
