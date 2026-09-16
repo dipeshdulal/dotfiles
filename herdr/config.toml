@@ -65,6 +65,11 @@ type = "plugin_action"
 command = "vim-herdr-navigation.right"
 description = "navigate right (vim/herdr)"
 
+# The built-in agent rows only show a terminal title for a few agent kinds, so pi
+# panes lost their title in the sidebar.
+[ui.sidebar.agents.rows_by_agent]
+pi = [["state_icon", "machine", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
+
 [experimental]
 # Enable Kitty graphics protocol support for inline images in Herdr panes.
 kitty_graphics = true
