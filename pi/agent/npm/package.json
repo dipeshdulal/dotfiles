@@ -2,11 +2,12 @@
   "name": "pi-extensions",
   "private": true,
   "dependencies": {
-    "@heyhuynhgiabuu/pi-diff": "^0.7.6",
-    "@heyhuynhgiabuu/pi-pretty": "^0.6.21",
+    "@heyhuynhgiabuu/pi-diff": "^0.9.1",
+    "@heyhuynhgiabuu/pi-pretty": "^0.6.29",
     "pi-claude-bridge": "^0.7.0",
+    "pi-mono-multi-edit": "^2.0.0",
     "pi-schedule-prompt": "^0.4.1",
-    "pi-web-access": "^0.21.0",
-    "pi-zentui": "^0.18.1"
+    "pi-web-access": "^0.29.0",
+    "pi-zentui": "^0.24.0"
   }
 }
