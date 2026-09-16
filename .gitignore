@@ -11,6 +11,9 @@ pi/agent/models-store.json
 pi/agent/models.json
 pi/agent/git/
 
+# Skill symlinks into a version-pinned global node_modules path
+claude/skills/hunk-review
+
 # herdr runtime state
 herdr/*.log
 herdr/*.sock
