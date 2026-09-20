@@ -25,4 +25,7 @@ herdr/.plugins.lock
 *.bak
 *.pre-omlx
 
+# Orphaned SST build state (no sst.config.* lives in this repo)
+.sst/
+
 .DS_Store
