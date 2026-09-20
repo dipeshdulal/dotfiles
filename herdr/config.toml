@@ -65,10 +65,15 @@ type = "plugin_action"
 command = "vim-herdr-navigation.right"
 description = "navigate right (vim/herdr)"
 
-# The built-in agent rows only show a terminal title for a few agent kinds, so pi
-# panes lost their title in the sidebar.
-[ui.sidebar.agents.rows_by_agent]
-pi = [["state_icon", "machine", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
+# Sidebar agent rows.
+# Line 1 is only WHERE the agent lives. Herdr auto-sizes the sidebar to fit
+# workspace names, so any extra token on this line (machine, tab, agent) gets
+# clipped -- keeping it to workspace guarantees it never truncates.
+# Line 2 carries the agent name/kind plus its live terminal title, i.e. what it
+# is actually working on. Empty rows collapse, so an agent with no terminal
+# title renders as a single line.
+[ui.sidebar.agents]
+rows = [["state_icon", "workspace"], ["agent", "terminal_title_stripped"]]
 
 [experimental]
 # Enable Kitty graphics protocol support for inline images in Herdr panes.
