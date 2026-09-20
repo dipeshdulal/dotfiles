@@ -116,10 +116,22 @@ typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 alias f="bash ~/.local/bin/herdr-sessionizer.sh"
+alias ft="bash ~/tmux_sessionizer.sh"
 
-export NVM_DIR="$HOME/.nvm"
+# nvm (Homebrew install; ~/.nvm has no bash_completion, Homebrew ships one)
+export NVM_DIR="/opt/homebrew/opt/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+[ -s "$NVM_DIR/etc/bash_completion.d/nvm" ] && \. "$NVM_DIR/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+
+# Java
+export JAVA_HOME="/opt/homebrew/opt/openjdk@17"
+export PATH="$JAVA_HOME/bin:$PATH"
+
+# 1Password CLI shell plugins
+[ -f "$HOME/.config/op/plugins.sh" ] && source "$HOME/.config/op/plugins.sh"
+
+# Local bin env (uv and friends)
+[ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
 
 # Added by LM Studio CLI (lms)
 export PATH="$PATH:$HOME/.lmstudio/bin"
@@ -133,5 +145,59 @@ export PATH="$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$ANDROID_
 # go bin path
 export PATH="$HOME/go/bin:$PATH"
 
+# cargo + dart pub globals
+export PATH="$PATH:$HOME/.cargo/bin"
+export PATH="$PATH:$HOME/.pub-cache/bin"
+
+# pip-installed user scripts
+export PATH="$PATH:$HOME/Library/Python/3.11/bin"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+[ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
+
+# pnpm
+export PNPM_HOME="$HOME/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
 # opencode
 export PATH="$HOME/.opencode/bin:$PATH"
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$("$HOME/miniforge3/bin/conda" 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "$HOME/miniforge3/etc/profile.d/conda.sh" ]; then
+        . "$HOME/miniforge3/etc/profile.d/conda.sh"
+    else
+        export PATH="$HOME/miniforge3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+
+if [ -f "$HOME/miniforge3/etc/profile.d/mamba.sh" ]; then
+    . "$HOME/miniforge3/etc/profile.d/mamba.sh"
+fi
+# <<< conda initialize <<<
+
+# --- Uniarch camera live feed ---
+# Usage: viewcam        -> main HD stream
+#        viewcam sub    -> lower-res smoother substream
+viewcam() {
+  local ip="192.168.1.70" stream="video1"
+  [[ "$1" == "sub" ]] && stream="video2"
+  local pw
+  pw=$(security find-generic-password -a admin -s uniarch-cam -w 2>/dev/null)
+  if [[ -z "$pw" ]]; then
+    echo "No camera password in Keychain. Run: security add-generic-password -a admin -s uniarch-cam -w 'YOUR_PASSWORD' -U"
+    return 1
+  fi
+  open -a VLC "rtsp://admin:${pw//@/%40}@${ip}:554/media/${stream}" && echo "Camera feed opening in VLC ($stream)..."
+}
