@@ -165,6 +165,14 @@ case ":$PATH:" in
 esac
 # pnpm end
 
+# omlx (present on the Mac Studio only; silent no-op elsewhere)
+if [ -d "$HOME/.omlx/bin" ]; then
+  case ":$PATH:" in
+    *":$HOME/.omlx/bin:"*) ;;
+    *) export PATH="$HOME/.omlx/bin:$PATH" ;;
+  esac
+fi
+
 # opencode
 export PATH="$HOME/.opencode/bin:$PATH"
 
