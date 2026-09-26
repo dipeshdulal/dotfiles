@@ -58,6 +58,7 @@ link herdr/config.toml "$HOME/.config/herdr/config.toml"
 
 echo "zsh"
 link zsh/zshrc "$HOME/.zshrc"
+link zsh/p10k.zsh "$HOME/.p10k.zsh"
 
 echo "tmux"
 link tmux/tmux.conf "$HOME/.tmux.conf"
