@@ -85,6 +85,10 @@ hl.window_rule({
 hl.window_rule({ match = { class = "^(zoom)$" }, float = true })
 hl.layer_rule({ match = { namespace = "^(quickshell)$" }, no_anim = true })
 hl.layer_rule({ match = { namespace = "^dms:.*" }, no_anim = true })
+-- Omasnap capture overlay: immediate, no animation. Intentionally NO
+-- no_screen_share -- Hyprland would black out the layer in captures and
+-- break scroll stitching.
+hl.layer_rule({ match = { namespace = "^omasnap$" }, no_anim = true, animation = "none" })
 
 require("dms.colors")
 require("dms.outputs")

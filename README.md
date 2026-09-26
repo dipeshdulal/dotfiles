@@ -54,6 +54,8 @@ and herdr's `*.log` / `*.sock` / `session.json` runtime state.
 5. **herdr navigation** — `herdr plugin link ~/projects/vim-herdr-navigation`.
 6. **desktop** — `./desktop/setup.sh` installs Nautilus + previews and makes it
    the default file manager.
+7. **screenshots** — `yay -S --needed omasnap-bin tesseract tesseract-data-eng`
+   (Omasnap, from the AUR; binds are in the tracked `hypr/` config).
 
 ## Sessionizer
 
@@ -87,7 +89,8 @@ replacing Dolphin. `desktop/setup.sh` installs the packages in
 The Hyprland side is tracked under `hypr/`:
 
 - `hypr/dms/binds-user.lua` — per-user DMS keybinds. `SUPER+E` opens
-  `nautilus --new-window`.
+  `nautilus --new-window`; `SUPER+B` opens the default browser via
+  `dms ipc call defaultApp browser`.
 - `hypr/hyprland.lua` — user Hyprland config. Floats both the Nautilus window
   and the Sushi previewer (`org.gnome.NautilusPreviewer`), so quick-look opens
   as a floating panel instead of being tiled.
@@ -105,6 +108,30 @@ Notes:
   `sudo pacman -Rns dolphin`.
 - `hyprctl reload` re-reads bindings but does not reliably re-apply Lua window
   rules; a full Hyprland restart does.
+
+## Screenshots (Omasnap)
+
+Screenshots use **Omasnap** — a native Wayland capture + annotation editor for
+Hyprland (the tool extracted from Omarchy) — replacing DMS's built-in
+`dms screenshot` bindings:
+
+- `Print` — smart picker (drag = region, click = window, click empty = monitor)
+- `CTRL + Print` — full monitor
+- `ALT + Print` — window
+
+It also does scroll capture with auto-stitching, annotation (shapes, arrows,
+highlighter, text, redaction), OCR, floating previews, and pins.
+
+Install from the AUR (not in the official repos; needs `yay`/`paru`):
+
+```bash
+yay -S --needed omasnap-bin tesseract tesseract-data-eng   # tesseract = OCR
+```
+
+The binds live in `hypr/dms/binds-user.lua` and the `no_anim` layer rule in
+`hypr/hyprland.lua`. Do **not** add `no_screen_share = true` to the Omasnap
+layer rule: Hyprland replaces the layer's rectangle with black in captures,
+which breaks scroll stitching.
 
 ## Alacritty
 
