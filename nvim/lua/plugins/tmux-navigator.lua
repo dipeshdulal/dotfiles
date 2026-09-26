@@ -10,6 +10,20 @@ return {
     vim.g.tmux_navigator_no_mappings = 1
   end,
   config = function()
-    dofile(vim.fn.expand("~/Projects/vim-herdr-navigation/editor/nvim.lua"))
+    -- Case-sensitive filesystems (Linux) need the lowercase path; macOS users
+    -- may have either. Probe both before falling back to plain wincmd.
+    for _, path in ipairs({
+      vim.fn.expand("~/projects/vim-herdr-navigation/editor/nvim.lua"),
+      vim.fn.expand("~/Projects/vim-herdr-navigation/editor/nvim.lua"),
+    }) do
+      if vim.fn.filereadable(path) == 1 then
+        dofile(path)
+        return
+      end
+    end
+    vim.notify(
+      "vim-herdr-navigation not found; falling back to wincmd",
+      vim.log.levels.WARN
+    )
   end,
 }

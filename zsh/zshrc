@@ -11,11 +11,20 @@ fi
 # Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time Oh My Zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="powerlevel10k/powerlevel10k"
+# This file is shared between the Mac Studio and Linux (Arch) boxes, so gate the
+# platform-specific blocks on the OS instead of forking the file per machine.
+case "$(uname -s)" in
+  Darwin) IS_MACOS=1; IS_LINUX=0 ;;
+  Linux)  IS_MACOS=0; IS_LINUX=1 ;;
+  *)      IS_MACOS=0; IS_LINUX=0 ;;
+esac
+
+# powerlevel10k when the theme is installed, stock theme otherwise.
+if [[ -d "$ZSH/custom/themes/powerlevel10k" ]]; then
+  ZSH_THEME="powerlevel10k/powerlevel10k"
+else
+  ZSH_THEME="robbyrussell"
+fi
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -33,7 +42,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Uncomment one of the following lines to change the auto-update behavior
 # zstyle ':omz:update' mode disabled  # disable automatic updates
 # zstyle ':omz:update' mode auto      # update automatically without asking
-# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
+# zstyle ':omz:update' mode reminder  # just remind you when it's time
 
 # Uncomment the following line to change how often to auto-update (in days).
 # zstyle ':omz:update' frequency 13
@@ -72,16 +81,22 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
 
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(git zsh-autosuggestions zsh-completions zsh-syntax-highlighting fast-syntax-highlighting)
+# Which plugins would you like to load? Standard plugins live in $ZSH/plugins,
+# custom ones in $ZSH/custom/plugins. Only load the extras that are actually
+# installed so a machine without them still starts clean.
+plugins=(git)
+for _plugin in zsh-autosuggestions zsh-completions zsh-syntax-highlighting fast-syntax-highlighting; do
+  if [[ -d "$ZSH/custom/plugins/$_plugin" || -d "$ZSH/plugins/$_plugin" ]]; then
+    plugins+=("$_plugin")
+  fi
+done
+unset _plugin
 
 source $ZSH/oh-my-zsh.sh
 
 typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+# Never drop into the p10k wizard on a machine with no ~/.p10k.zsh yet.
+typeset -g POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD=true
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -115,17 +130,30 @@ typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+# herdr: fuzzy-pick a project into the persistent agent session.
+# ft is the older tmux port, kept for when herdr isn't around.
 alias f="bash ~/.local/bin/herdr-sessionizer.sh"
-alias ft="bash ~/tmux_sessionizer.sh"
+[[ -f "$HOME/tmux-sessionizer.sh" || -f "$HOME/tmux_sessionizer.sh" ]] && \
+  alias ft="bash $( [[ -f "$HOME/tmux-sessionizer.sh" ]] && echo "$HOME/tmux-sessionizer.sh" || echo "$HOME/tmux_sessionizer.sh" )"
 
-# nvm (Homebrew install; ~/.nvm has no bash_completion, Homebrew ships one)
-export NVM_DIR="/opt/homebrew/opt/nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/etc/bash_completion.d/nvm" ] && \. "$NVM_DIR/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+# nvm — Homebrew on macOS, the distro package on Linux.
+if [[ $IS_MACOS == 1 && -s "/opt/homebrew/opt/nvm/nvm.sh" ]]; then
+  export NVM_DIR="/opt/homebrew/opt/nvm"
+  \. "$NVM_DIR/nvm.sh"  # This loads nvm
+  [ -s "$NVM_DIR/etc/bash_completion.d/nvm" ] && \. "$NVM_DIR/etc/bash_completion.d/nvm"  # nvm bash_completion
+elif [ -s "/usr/share/nvm/init-nvm.sh" ]; then
+  source /usr/share/nvm/init-nvm.sh
+elif [ -s "$HOME/.nvm/nvm.sh" ]; then
+  export NVM_DIR="$HOME/.nvm"
+  \. "$NVM_DIR/nvm.sh"
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+fi
 
-# Java
-export JAVA_HOME="/opt/homebrew/opt/openjdk@17"
-export PATH="$JAVA_HOME/bin:$PATH"
+# Java (Homebrew on macOS; defer to the system JDK elsewhere)
+if [ -d "/opt/homebrew/opt/openjdk@17" ]; then
+  export JAVA_HOME="/opt/homebrew/opt/openjdk@17"
+  export PATH="$JAVA_HOME/bin:$PATH"
+fi
 
 # 1Password CLI shell plugins
 [ -f "$HOME/.config/op/plugins.sh" ] && source "$HOME/.config/op/plugins.sh"
@@ -138,9 +166,13 @@ export PATH="$PATH:$HOME/.lmstudio/bin"
 # End of LM Studio CLI section
 
 # Flutter (via FVM global) + Android SDK
-export PATH="$PATH:$HOME/fvm/default/bin"
-export ANDROID_HOME="$HOME/Library/Android/sdk"
-export PATH="$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/tools"
+[ -d "$HOME/fvm/default/bin" ] && export PATH="$PATH:$HOME/fvm/default/bin"
+if [[ $IS_MACOS == 1 ]]; then
+  export ANDROID_HOME="$HOME/Library/Android/sdk"
+else
+  export ANDROID_HOME="${ANDROID_HOME:-$HOME/Android/Sdk}"
+fi
+[ -d "$ANDROID_HOME" ] && export PATH="$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/tools"
 
 # go bin path
 export PATH="$HOME/go/bin:$PATH"
@@ -150,7 +182,11 @@ export PATH="$PATH:$HOME/.cargo/bin"
 export PATH="$PATH:$HOME/.pub-cache/bin"
 
 # pip-installed user scripts
-export PATH="$PATH:$HOME/Library/Python/3.11/bin"
+if [[ $IS_MACOS == 1 ]]; then
+  export PATH="$PATH:$HOME/Library/Python/3.11/bin"
+else
+  export PATH="$PATH:$HOME/.local/bin"
+fi
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
@@ -158,7 +194,11 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 [ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
 
 # pnpm
-export PNPM_HOME="$HOME/Library/pnpm"
+if [[ $IS_MACOS == 1 ]]; then
+  export PNPM_HOME="$HOME/Library/pnpm"
+else
+  export PNPM_HOME="${PNPM_HOME:-$HOME/.local/share/pnpm}"
+fi
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
@@ -195,17 +235,27 @@ if [ -f "$HOME/miniforge3/etc/profile.d/mamba.sh" ]; then
 fi
 # <<< conda initialize <<<
 
-# --- Uniarch camera live feed ---
+# --- Uniarch camera live feed (macOS only) ---
 # Usage: viewcam        -> main HD stream
 #        viewcam sub    -> lower-res smoother substream
-viewcam() {
-  local ip="192.168.1.70" stream="video1"
-  [[ "$1" == "sub" ]] && stream="video2"
-  local pw
-  pw=$(security find-generic-password -a admin -s uniarch-cam -w 2>/dev/null)
-  if [[ -z "$pw" ]]; then
-    echo "No camera password in Keychain. Run: security add-generic-password -a admin -s uniarch-cam -w 'YOUR_PASSWORD' -U"
-    return 1
+if [[ $IS_MACOS == 1 ]]; then
+  viewcam() {
+    local ip="192.168.1.70" stream="video1"
+    [[ "$1" == "sub" ]] && stream="video2"
+    local pw
+    pw=$(security find-generic-password -a admin -s uniarch-cam -w 2>/dev/null)
+    if [[ -z "$pw" ]]; then
+      echo "No camera password in Keychain. Run: security add-generic-password -a admin -s uniarch-cam -w 'YOUR_PASSWORD' -U"
+      return 1
+    fi
+    open -a VLC "rtsp://admin:${pw//@/%40}@${ip}:554/media/${stream}" && echo "Camera feed opening in VLC ($stream)..."
+  }
+fi
+
+# --- work network (Linux laptop -> Mac Studio) ---
+if [[ $IS_LINUX == 1 ]]; then
+  alias workssh='ssh dipesh.dulal@localworkmac'
+  if command -v sshuttle >/dev/null 2>&1; then
+    alias worknetwork='sudo sshuttle --disable-ipv6 -r dipesh.dulal@localworkmac 0/0'
   fi
-  open -a VLC "rtsp://admin:${pw//@/%40}@${ip}:554/media/${stream}" && echo "Camera feed opening in VLC ($stream)..."
-}
+fi
