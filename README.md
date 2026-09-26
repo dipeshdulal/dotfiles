@@ -1,7 +1,8 @@
 # dotfiles
 
-Neovim, pi, herdr, tmux and zsh configuration, symlinked into place by
-`install.sh`.
+Neovim, pi, herdr, tmux and zsh configuration, plus the Hyprland (DMS)
+window/binding overrides and the desktop file-manager setup, symlinked into
+place by `install.sh`.
 
 ```bash
 git clone https://github.com/dipeshdulal/dotfiles ~/dotfiles
@@ -25,6 +26,8 @@ this repo. `git status` shows drift immediately; there is no sync step.
 | herdr     | `herdr/config.toml`   | `~/.config/herdr/config.toml`     |
 | zsh       | `zsh/zshrc`           | `~/.zshrc`                        |
 | tmux      | `tmux/tmux.conf`      | `~/.tmux.conf`                    |
+| hypr      | `hypr/`               | `~/.config/hypr/…` (per file)     |
+| desktop   | `desktop/`            | not symlinked; run `setup.sh`     |
 | bin       | `bin/`                | `~/.local/bin/`                   |
 
 ## Secrets
@@ -49,6 +52,8 @@ and herdr's `*.log` / `*.sock` / `session.json` runtime state.
 4. **tmux plugins** — `git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm`,
    then `tmux source ~/.tmux.conf` and `prefix+I`.
 5. **herdr navigation** — `herdr plugin link ~/projects/vim-herdr-navigation`.
+6. **desktop** — `./desktop/setup.sh` installs Nautilus + previews and makes it
+   the default file manager.
 
 ## Sessionizer
 
@@ -72,6 +77,34 @@ the checkout's `editor/nvim.lua` as the single source of truth — adjust the pa
 in `nvim/lua/plugins/tmux-navigator.lua` if your checkout isn't at
 `~/projects/vim-herdr-navigation`. It falls back to tmux (`$TMUX`) or plain
 `wincmd` outside a herdr pane. Requires herdr `>= 0.7.0` and `jq`.
+
+## Desktop / file manager
+
+Files is **Nautilus** (GNOME Files) with **Sushi** for spacebar quick-look,
+replacing Dolphin. `desktop/setup.sh` installs the packages in
+`desktop/packages.txt` and points `inode/directory` at Nautilus.
+
+The Hyprland side is tracked under `hypr/`:
+
+- `hypr/dms/binds-user.lua` — per-user DMS keybinds. `SUPER+E` opens
+  `nautilus --new-window`.
+- `hypr/hyprland.lua` — user Hyprland config. Floats both the Nautilus window
+  and the Sushi previewer (`org.gnome.NautilusPreviewer`), so quick-look opens
+  as a floating panel instead of being tiled.
+
+Notes:
+
+- Nautilus 50 pulls in the GNOME indexer (`localsearch` / `tinysparql`). Mask
+  it for no background indexing:
+  `systemctl --user mask localsearch-3.service tinysparql-3.service`.
+- **Do not install `hyprpolkitagent`.** DMS already runs a polkit agent via
+  Quickshell; a second one fails to register ("an authentication agent already
+  exists") and then segfaults. It is only needed on bare Hyprland without DMS.
+- Removing Dolphin: protect deps you still want first —
+  `sudo pacman -D --asexplicit udisks2 upower ripgrep` — then
+  `sudo pacman -Rns dolphin`.
+- `hyprctl reload` re-reads bindings but does not reliably re-apply Lua window
+  rules; a full Hyprland restart does.
 
 ## Alacritty
 

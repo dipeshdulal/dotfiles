@@ -63,6 +63,10 @@ link zsh/p10k.zsh "$HOME/.p10k.zsh"
 echo "tmux"
 link tmux/tmux.conf "$HOME/.tmux.conf"
 
+echo "hypr"
+link hypr/hyprland.lua       "$HOME/.config/hypr/hyprland.lua"
+link hypr/dms/binds-user.lua "$HOME/.config/hypr/dms/binds-user.lua"
+
 echo "bin"
 link bin/herdr-sessionizer.sh "$HOME/.local/bin/herdr-sessionizer.sh"
 
@@ -78,4 +82,5 @@ Done. Remaining manual steps:
   4. tmux plugins git clone https://github.com/tmux-plugins/tpm \
                     ~/.tmux/plugins/tpm && tmux source ~/.tmux.conf, then prefix+I
   5. herdr nav    herdr plugin link ~/projects/vim-herdr-navigation
+  6. desktop      ./desktop/setup.sh  (Nautilus file manager + previews)
 EOF

@@ -1,0 +1,15 @@
+# File manager: Nautilus (GNOME Files) + Sushi quick-look previewer.
+# Replaces Dolphin; the keybind and window rules live in ../hypr/.
+nautilus
+sushi
+
+# gvfs backends so Nautilus can see phones, cameras, phones-as-cameras and
+# SMB/Windows shares. Plain `gvfs` arrives as a dependency of nautilus.
+gvfs-mtp
+gvfs-smb
+gvfs-afc
+gvfs-gphoto2
+
+# Archive handling and video thumbnails in Nautilus / Sushi.
+file-roller
+ffmpegthumbnailer
