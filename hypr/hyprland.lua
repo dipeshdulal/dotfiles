@@ -18,6 +18,11 @@ hl.config({
 		kb_layout = "",
 		numlock_by_default = true,
 		follow_mouse = 1,
+		-- Pointer feel: "flat" = no libinput acceleration (linear/predictable,
+		-- closer to macOS than the default "adaptive" curve). Tune sensitivity
+		-- (-1.0..1.0) if it's too slow/fast; 0.0 = neutral.
+		accel_profile = "flat",
+		sensitivity = 0.0,
 		touchpad = {
 			tap_to_click = true,
 			natural_scroll = true,
