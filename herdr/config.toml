@@ -5,8 +5,39 @@ show_agent_labels_on_pane_borders = true
 pane_gaps = false   # panes sit flush (border only), no blank gutter between them
 
 [theme]
+# Base is "catppuccin" (Mocha); the tokens below override it to opencode's
+# built-in "catppuccin-macchiato" palette so Herdr chrome matches the opencode
+# panes. Source of truth: opencode theme `catppuccin-macchiato` (macchiato roles).
 name = "catppuccin"
 auto_switch = false
+
+# opencode role -> herdr token:
+#   background        -> panel_bg
+#   backgroundPanel   -> sidebar_bg
+#   backgroundElement -> active_row_bg
+#   border            -> selection_bg / surface0
+#   primary           -> accent
+#   text / textMuted  -> text / subtext0
+[theme.custom]
+panel_bg      = "#24273a"  # macBase
+sidebar_bg    = "#1e2030"  # macMantle
+active_row_bg = "#181926"  # macCrust
+selection_bg  = "#363a4f"  # macSurface0
+surface0      = "#363a4f"  # macSurface0
+surface1      = "#494d64"  # macSurface1
+surface_dim   = "#1e2030"  # macMantle
+overlay0      = "#6e738d"  # macOverlay0
+overlay1      = "#8087a2"  # macOverlay1
+text          = "#cad3f5"  # macText
+subtext0      = "#a5adcb"  # macSubtext0
+accent        = "#c6a0f6"  # macMauve (opencode primary)
+mauve         = "#c6a0f6"  # macMauve
+green         = "#a6da95"  # macGreen
+yellow        = "#eed49f"  # macYellow
+red           = "#ed8796"  # macRed
+blue          = "#8aadf4"  # macBlue
+teal          = "#8bd5ca"  # macTeal
+peach         = "#f5a97f"  # macPeach
 
 [keys]
 # tmux-aligned bindings. Prefix stays ctrl+b (same as tmux).
