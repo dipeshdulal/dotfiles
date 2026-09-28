@@ -259,3 +259,6 @@ if [[ $IS_LINUX == 1 ]]; then
     alias worknetwork='sudo sshuttle --disable-ipv6 -r dipesh.dulal@localworkmac 0/0'
   fi
 fi
+
+# Added by the Hunk installer (https://hunk.dev)
+export PATH='/home/dipesh/.hunk/bin':"$PATH"
