@@ -1,8 +1,11 @@
 -- DankMaterialShell / matugen base16 theme.
--- Machine-local to the Arch + DMS desktop: matugen regenerates this file whenever
--- the wallpaper changes, so it lives in the repo only to survive a fresh clone.
--- Guarded so a machine without DMS (e.g. the Mac Studio) loads nothing and keeps
--- its catppuccin colours.
+-- DISABLED: the desktop stack (Ghostty + Herdr + opencode) is now catppuccin
+-- macchiato, so nvim uses catppuccin (see catpuccin.lua) instead of the
+-- material-you base16 palette. Restore the base16 setup below to bring DMS
+-- colours back on Linux.
+return {}
+
+--[[ original base16 override (material-you / DMS)
 if
   vim.fn.has("linux") == 0
   or vim.fn.isdirectory(vim.fn.expand("~/.config/DankMaterialShell")) == 0
@@ -102,3 +105,5 @@ return {
 		end
 	}
 }
+]]
+
