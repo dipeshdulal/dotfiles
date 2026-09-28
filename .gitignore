@@ -23,6 +23,7 @@ herdr/.plugins.lock
 
 # Backups install.sh makes
 *.bak
+*.bak.*
 *.pre-omlx
 
 # Orphaned SST build state (no sst.config.* lives in this repo)
