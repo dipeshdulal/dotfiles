@@ -111,3 +111,14 @@ hl.config({
 		gaps_out = 5,
 	},
 })
+
+-- Chrome/Chromium screen-share indicator ("<site> is sharing your screen.").
+-- It's a separate always-on-top window whose "Hide" button asks the compositor
+-- to minimize; Hyprland has no minimize, so the button silently does nothing.
+-- Route the window to a hidden special workspace instead. "silent" keeps the
+-- special workspace from popping open. Re-share for it to take effect.
+hl.window_rule({
+	name = "hide-screen-share-indicator",
+	match = { title = ".*is sharing.*" },
+	workspace = "special:hidden silent",
+})
