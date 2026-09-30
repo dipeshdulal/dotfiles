@@ -6,6 +6,13 @@ hl.bind("SUPER + E", hl.dsp.exec_cmd("nautilus --new-window"))
 -- Browser: DMS default browser (Settings → Default Apps)
 hl.bind("SUPER + B", hl.dsp.exec_cmd("dms ipc call defaultApp browser"))
 
+-- Chrome/Chromium Hard Reload. On Linux the chord is CTRL+SHIFT+R, not
+-- SUPER+SHIFT+R (that is the macOS mapping). DMS binds CTRL+SHIFT+R to
+-- workspace-rename, which swallowed it before Chrome could ever see it.
+-- Rebind to Ctrl+Delete instead, which Chrome also treats as hard reload.
+hl.unbind("CTRL + SHIFT + R")
+hl.bind("CTRL + Delete", hl.dsp.send_shortcut({ mods = "CTRL SHIFT", key = "r" }))
+
 -- Screenshots: Omasnap (annotation + scroll capture), replacing DMS built-ins.
 -- Do NOT add no_screen_share to Omasnap's layer rule: it blacks out captures
 -- and breaks scroll stitching (see hypr/hyprland.lua).
@@ -51,3 +58,9 @@ end)
 hl.bind("SUPER + right", function()
   hl.dispatch(hl.dsp.send_shortcut({ mods = "", key = "End" }))
 end)
+
+-- Config hot reload. Hyprland ships SUPER+SHIFT+R -> hyprctl reload by default,
+-- but DMS's default binds do not, so the chord was unbound. Note: reload
+-- re-reads binds but does not reliably re-apply Lua window rules (see
+-- dotfiles/README.md) -- a full restart is needed for hl.window_rule changes.
+hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("hyprctl reload"))
