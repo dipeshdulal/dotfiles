@@ -1,0 +1,11 @@
+# Sourced by zsh for every invocation, including non-interactive shells
+# (scripts, `zsh -c`, agent tool calls). Keep this file fast and side-effect
+# free; anything expensive belongs in .zshrc.
+
+# Graphical sudo password prompt, so sudo can authenticate without a TTY.
+# SUDO_ASKPASS_REQUIRE=force routes every sudo call through the helper,
+# including plain `sudo` in a terminal (not only `sudo -A`).
+if [[ -x "$HOME/dotfiles/bin/sudo-askpass.sh" ]] && command -v zenity >/dev/null 2>&1; then
+  export SUDO_ASKPASS="$HOME/dotfiles/bin/sudo-askpass.sh"
+  export SUDO_ASKPASS_REQUIRE=force
+fi

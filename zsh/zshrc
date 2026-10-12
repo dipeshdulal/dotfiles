@@ -188,6 +188,10 @@ else
   export PATH="$PATH:$HOME/.local/bin"
 fi
 
+# Graphical sudo password prompt now lives in .zshenv, which zsh also sources
+# for non-interactive shells (agent tool calls, scripts). Keeping it out of
+# zshrc avoids duplicating the same PATH check in two files.
+
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"

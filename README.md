@@ -109,6 +109,36 @@ Notes:
 - `hyprctl reload` re-reads bindings but does not reliably re-apply Lua window
   rules; a full Hyprland restart does.
 
+## sudo from scripts and agent tool calls
+
+`bin/sudo-askpass.sh` gives `sudo` a graphical prompt (zenity on Wayland) via
+`SUDO_ASKPASS` + `SUDO_ASKPASS_REQUIRE=force`, exported from `zsh/zshenv` so it
+also applies to non-interactive shells and agent tool calls.
+
+**The constraint that shapes everything here:** `/etc/pam.d/system-auth` enables
+`pam_faillock`, and `/etc/security/faillock.conf` is entirely commented out, so
+the built-in defaults apply — `deny=3`, `fail_interval=900`, `unlock_time=600`.
+That means:
+
+- Only **3** failed sudo attempts before the account locks for 10 minutes.
+- During a lockout, `pam_faillock.so preauth` rejects auth *before* the password
+  is checked, so the **correct password fails everywhere**, terminals included.
+- An empty answer from askpass counts as a failure, and sudo retries 3 times on
+  its own. A helper that gave up on the first dismissed dialog would therefore
+  burn all three strikes at once and lock you out.
+
+Consequences:
+
+- `sudo-askpass.sh` re-prompts until it gets a password instead of exiting on an
+  empty one, and no longer hides zenity's stderr — swallowed errors previously
+  made a failed dialog look like a wrong password.
+- Non-interactive scripts must check `sudo -n true` and abort if it fails.
+  `-n` never prompts and never spends a strike; `sudo -v` still spends strikes
+  on failure. `fcitx5/setup.sh` does this.
+
+If you do get locked out, the lock clears itself after `unlock_time` (10 min);
+`faillock` shows the pending records and `faillock -u dipesh` clears them as root.
+
 ## Japanese + Nepali input (Fcitx5 + Mozc + Lekhika)
 
 Both languages are typed as **romaji** — plain ASCII on a US keyboard, with
