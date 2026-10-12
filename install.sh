@@ -83,4 +83,6 @@ Done. Remaining manual steps:
                     ~/.tmux/plugins/tpm && tmux source ~/.tmux.conf, then prefix+I
   5. herdr nav    herdr plugin link ~/projects/vim-herdr-navigation
   6. desktop      ./desktop/setup.sh  (Nautilus file manager + previews)
+  7. input        ./fcitx5/setup.sh   (Fcitx5 + Mozc + Lekhika: Japanese
+                                       and Nepali romaji typing)
 EOF

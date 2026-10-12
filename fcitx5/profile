@@ -1,0 +1,48 @@
+# Fcitx5 group configuration -- Japanese + Nepali romaji input.
+#
+# Seeded (copied, not symlinked) into ~/.config/fcitx5 by ./setup.sh.
+# Fcitx5 rewrites this file when it exits, so symlinking it into the
+# dotfiles repo would leave it permanently dirty.
+#
+# One group per language. Ctrl+Space toggles the IME inside the active
+# group; Ctrl+Shift+Space changes group (see ./config for why that is
+# not fcitx5's default).
+#
+# BOTH groups set "Default Layout=us", which is counter-intuitive but
+# required: both engines are romanization, so they consume plain ASCII
+# keys and do the conversion themselves. Setting this to "np" would hand
+# the engine an already-remapped keymap and break romaji entirely.
+
+[Groups/0]
+Name=Japanese
+# The XKB layout fcitx switches to. Matches input.kb_layout in
+# hyprland.lua (which inherits XKB_DEFAULT_LAYOUT = us).
+Default Layout=us
+DefaultIM=mozc
+
+[Groups/0/Items/0]
+Name=keyboard-us
+
+[Groups/0/Items/1]
+Name=mozc
+
+[Groups/1]
+Name=Nepali
+# See the note above: us, not np -- lekhika transliterates ASCII.
+Default Layout=us
+# The inputmethod descriptor installed by fcitx5-lekhika declares
+# UniqueName=fcitx5lekhika (config/fcitx5lekhika.conf upstream). That
+# unique name is what goes here, NOT the display name "Lekhika Nepali
+# Input Method" and NOT "lekhika" -- the latter silently yields an
+# empty group that fcitx5 cannot switch to.
+DefaultIM=fcitx5lekhika
+
+[Groups/1/Items/0]
+Name=keyboard-us
+
+[Groups/1/Items/1]
+Name=fcitx5lekhika
+
+[GroupOrder]
+0=Japanese
+1=Nepali

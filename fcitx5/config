@@ -1,0 +1,51 @@
+# Global Fcitx5 options -- Japanese + Nepali romaji input.
+#
+# Seeded (copied, not symlinked) into ~/.config/fcitx5 by ./setup.sh, for the
+# same save-on-exit reason as ./profile.
+
+[Hotkey/TriggerKeys]
+# Ctrl+Space toggles the IME on/off inside the active group, i.e.
+# ASCII <-> mozc (Japanese) or ASCII <-> fcitx5lekhika (Nepali).
+# Hyprland does not bind it, so fcitx5 receives the chord directly:
+# Super+Space is DMS spotlight and Alt+Space is DMS spotlight-bar, but
+# Ctrl+Space is free (verified with `hyprctl binds -j`).
+#
+# Deliberately NOT setting AltTriggerKeys=Shift_L (a common preference for
+# toggling on a bare left Shift). binds-user.lua uses Shift+Home +
+# BackSpace for Super+Backspace line editing, and a bare-Shift IME trigger
+# would fight it.
+0=CTRL+space
+
+[Hotkey/AltTriggerKeys]
+
+[Hotkey/EnumerateForwardKeys]
+
+[Hotkey/EnumerateBackwardKeys]
+
+[Hotkey/EnumerateGroupForwardKeys]
+# Ctrl+Shift+Space moves between the two groups in ./profile
+# (Japanese <-> Nepali).
+#
+# This MUST be set. Fcitx5's built-in default is Super+Space, which is
+# already bound to DMS spotlight on this machine, so leaving the default
+# would make the Nepali group unreachable. Ctrl+Shift+Space was verified
+# unbound via `hyprctl binds -j`.
+0=CTRL+SHIFT+space
+
+[Hotkey/EnumerateGroupBackwardKeys]
+# Intentionally empty. With two groups, forward already wraps around,
+# and the natural pairing candidate here (Ctrl+Shift+Shift+Space) is not
+# expressible as a distinct chord.
+
+[Behavior]
+# Show which IM is active and its mode, so there is a visible cue for
+# Japanese vs. Nepali vs. direct input beyond the candidate window.
+# This matters more now that there are two groups: the group name alone
+# does not tell you whether the IME is currently on.
+ShowInputMethodInformation=True
+CompactInputMethodInformation=True
+DefaultPageSize=5
+
+# Never run the IME in password fields: without this a half-typed romaji
+# preedit can be committed into a password prompt.
+AllowInputMethodForPassword=False

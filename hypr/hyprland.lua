@@ -12,6 +12,28 @@ hl.on("hyprland.start", function()
 end)
 -- DMS_STARTUP_END
 
+-- Japanese + Nepali input (Fcitx5 + Mozc + Lekhika, romaji). Packages,
+-- profile and hotkeys come from ../fcitx5/ -- see that directory's setup.sh.
+--
+-- The module name is "fcitx", not "fcitx5": that is the identifier shipped by
+-- fcitx5-gtk / fcitx5-qt. Wayland-native GTK4/Qt6 apps use text-input-v3 and
+-- work without GTK_IM_MODULE, but setting it globally gives full Fcitx
+-- features and is what XWayland apps need. Trade-off: if the candidate window
+-- flickers in Wayland-native GTK apps, drop GTK_IM_MODULE here and leave the
+-- others set. SDL_IM_MODULE covers games built against older SDL2.
+hl.env("GTK_IM_MODULE", "fcitx")
+hl.env("QT_IM_MODULE", "fcitx")
+hl.env("SDL_IM_MODULE", "fcitx")
+hl.env("XMODIFIERS", "@im=fcitx")
+
+-- Started from the event, not the top level, so saving this file does not
+-- spawn a second instance. --replace makes this idempotent anyway, which
+-- matters because the XDG autostart desktop file may also launch fcitx5.
+hl.on("hyprland.start", function()
+  hl.exec_cmd("fcitx5 -d --replace")
+end)
+
+
 hl.config({
 	input = {
 		-- empty inherits XKB_DEFAULT_LAYOUT (libxkbcommon), falls back to "us"

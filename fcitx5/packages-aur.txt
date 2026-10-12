@@ -1,0 +1,16 @@
+# Nepali input: liblekhika (the roman -> Devanagari transliteration core)
+# and its fcitx5 addon, fcitx5-lekhika.
+#
+# AUR-only, installed with yay by ./setup.sh. Both are -git packages that
+# compile from source, because upstream deleted the workflow that produced
+# prebuilt binaries. Expect a few minutes on first run.
+#
+# Caveats worth knowing before you install:
+#   * Very new project (first AUR submission Sep 2025, 0 votes). It works,
+#     but it is not distro-packaged and carries no support commitment.
+#   * The engine is rules-based, so transliteration itself works with no
+#     dictionary at all. The optional 113 MB pre-trained word-suggestion
+#     database is a separate, opt-in step (./setup.sh --dictionary).
+#   * Undo with `yay -Rns fcitx5-lekhika-git liblekhika-git`.
+liblekhika-git
+fcitx5-lekhika-git

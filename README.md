@@ -109,6 +109,60 @@ Notes:
 - `hyprctl reload` re-reads bindings but does not reliably re-apply Lua window
   rules; a full Hyprland restart does.
 
+## Japanese + Nepali input (Fcitx5 + Mozc + Lekhika)
+
+Both languages are typed as **romaji** — plain ASCII on a US keyboard, with
+Fcitx5 doing the conversion. Japanese uses Mozc (Google Japanese Input); Nepali
+uses Lekhika, a roman → Devanagari transliteration engine.
+
+Set up with `./fcitx5/setup.sh`; the Hyprland side (env vars, autostart) is
+already configured in `hypr/hyprland.lua`.
+
+| Key | Action |
+| --- | --- |
+| `Ctrl+Space` | toggle the IME in the current language |
+| `Ctrl+Shift+Space` | switch language: Japanese ↔ Nepali |
+
+So Japanese is `Ctrl+Space` then `nihongo` + `Space`; Nepali is
+`Ctrl+Shift+Space`, `Ctrl+Space`, then `namaste` + `Space`.
+
+`Ctrl+Space` is used because Hyprland does not bind it — `Super+Space` and
+`Alt+Space` are DMS spotlight. `Ctrl+Shift+Space` is a **deliberate override**:
+Fcitx5's default language-switch key is `Super+Space`, which is already taken
+here, so leaving the default would make Nepali unreachable.
+
+Notes:
+
+- Both groups use the `us` XKB layout, not `np`. Both engines consume ASCII
+  keys and transliterate themselves, so handing Lekhika an already-remapped
+  Devanagari keymap would break it. This is why Nepali here is romaji rather
+  than a physical Nepali layout; switch to `input.kb_layout = "us,np"` in
+  `hypr/hyprland.lua` if you want the physical layout instead.
+- The Nepali engine is **AUR-only and compiled from source** (`liblekhika-git`,
+  `fcitx5-lekhika-git`) — upstream removed its prebuilt-binary workflow. It is
+  a young project with no support commitment, so `setup.sh` treats a build
+  failure as non-fatal and leaves Japanese working. Remove with
+  `yay -Rns fcitx5-lekhika-git liblekhika-git`.
+- Transliteration is rules-based and works with **no dictionary at all**. The
+  113 MB pre-trained word-suggestion DB is opt-in: `./setup.sh --dictionary`.
+- The group item is named `fcitx5lekhika` in `profile`, from the upstream
+  `UniqueName`. The display name ("Lekhika Nepali Input Method") and the bare
+  word `lekhika` both fail silently, leaving an unselectable group.
+- The active IM and mode are shown in the indicator
+  (`ShowInputMethodInformation`) — worth having with two groups, since the
+  group name alone does not tell you whether the IME is on.
+- IME is disabled in password fields, so a half-typed romaji preedit cannot be
+  committed into a password prompt.
+- `GTK_IM_MODULE`/`QT_IM_MODULE` are set globally for Fcitx5 features and
+  XWayland compatibility. If the candidate window flickers in Wayland-native
+  GTK apps, drop `GTK_IM_MODULE` from `hypr/hyprland.lua` and leave the rest.
+- Profile/config are **copied**, not symlinked, by `setup.sh`. Fcitx5 rewrites
+  `~/.config/fcitx5/*` on exit, so a symlink would leave the dotfiles repo
+  permanently dirty. Stop Fcitx5 from the tray before editing those by hand.
+- Requires `noto-fonts-cjk` for Japanese glyphs; `setup.sh` warns if missing.
+- Check status with `fcitx5-remote` (`1` = ASCII, `2` = IME on); diagnose with
+  `fcitx5-diagnose`.
+
 ## Screenshots (Omasnap)
 
 Screenshots use **Omasnap** — a native Wayland capture + annotation editor for
