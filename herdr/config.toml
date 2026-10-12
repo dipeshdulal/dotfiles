@@ -100,11 +100,18 @@ description = "navigate right (vim/herdr)"
 # Line 1 is only WHERE the agent lives. Herdr auto-sizes the sidebar to fit
 # workspace names, so any extra token on this line (machine, tab, agent) gets
 # clipped -- keeping it to workspace guarantees it never truncates.
-# Line 2 carries the agent name/kind plus its live terminal title, i.e. what it
-# is actually working on. Empty rows collapse, so an agent with no terminal
-# title renders as a single line.
+# Line 2 is the live terminal title, i.e. what the agent is actually working on.
+# It owns the whole line: pairing it with the agent-kind token crushed the title
+# down to a few characters. Empty rows collapse, so an agent that reports no
+# terminal title renders as a single line.
 [ui.sidebar.agents]
-rows = [["state_icon", "workspace"], ["agent", "terminal_title_stripped"]]
+rows = [["state_icon", "workspace"], ["terminal_title_stripped"]]
+
+# Agents that do not report a terminal title would leave line 2 blank, so they
+# keep the agent name/kind on the same line as the (usually empty) title.
+[ui.sidebar.agents.rows_by_agent]
+claude = [["state_icon", "workspace"], ["agent", "terminal_title_stripped"]]
+pi = [["state_icon", "workspace"], ["agent", "terminal_title_stripped"]]
 
 [experimental]
 # Enable Kitty graphics protocol support for inline images in Herdr panes.
