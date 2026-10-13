@@ -139,57 +139,133 @@ Consequences:
 If you do get locked out, the lock clears itself after `unlock_time` (10 min);
 `faillock` shows the pending records and `faillock -u dipesh` clears them as root.
 
-## Japanese + Nepali input (Fcitx5 + Mozc + Lekhika)
+## Japanese + Nepali input (Fcitx5 + Mozc + m17n)
 
-Both languages are typed as **romaji** — plain ASCII on a US keyboard, with
-Fcitx5 doing the conversion. Japanese uses Mozc (Google Japanese Input); Nepali
-uses Lekhika, a roman → Devanagari transliteration engine.
+Japanese uses Mozc (Google Japanese Input); Nepali uses m17n's `ne-rom`, the
+romanized **keyboard layout** published by MPP (Madan Puraskar Pustakalaya) —
+the same layout as the "Nepali Romanized" Keyman keyboard. Both engines are
+official-repo packages, no AUR.
 
 Set up with `./fcitx5/setup.sh`; the Hyprland side (env vars, autostart) is
 already configured in `hypr/hyprland.lua`.
 
 | Key | Action |
 | --- | --- |
-| `Ctrl+Space` | toggle the IME in the current language |
-| `Ctrl+Shift+Space` | switch language: Japanese ↔ Nepali |
+| `Ctrl+Space` | next language: U.S. → Japanese → Nepali → U.S. |
+| `Ctrl+Shift+Space` | previous language |
 
-So Japanese is `Ctrl+Space` then `nihongo` + `Space`; Nepali is
-`Ctrl+Shift+Space`, `Ctrl+Space`, then `namaste` + `Space`.
+All three live in **one group**, so `Ctrl+Space` walks the list the way macOS
+cycles input sources. There is no separate IME on/off toggle: the `keyboard-us`
+entry *is* the off state. So Japanese is `Ctrl+Space` then `nihongo` + `Space`;
+Nepali is `Ctrl+Space` again, then `k a Q m a x w M` → काठमाडौं.
 
 `Ctrl+Space` is used because Hyprland does not bind it — `Super+Space` and
-`Alt+Space` are DMS spotlight. `Ctrl+Shift+Space` is a **deliberate override**:
-Fcitx5's default language-switch key is `Super+Space`, which is already taken
-here, so leaving the default would make Nepali unreachable.
+`Alt+Space` are DMS spotlight. The `Ctrl+Space` in `fcitx5/config` is
+*EnumerateForwardKeys*, not the built-in *TriggerKeys* (also `Ctrl+Space`).
+Trigger is matched first, so it is cleared in `config` to stop it swallowing the
+chord and toggling on/off instead of walking.
+
+### Kana modes (the macOS "ひらがな / カタカナ" menu)
+
+There is no menu, because in Mozc the kana widths are not separate input
+sources — they are modes *inside* the one Japanese entry, switched from the
+keyboard. These are Mozc's compiled-in defaults and match macOS' Google IME:
+
+| Key | Result |
+| --- | --- |
+| `F6` / `Ctrl+u` | ひらがな |
+| `F7` / `Ctrl+i` | 全角カタカナ |
+| `F8` / `Ctrl+o` | 半角カタカナ |
+| `F9` / `Ctrl+p` | 全角ＡＢＣ |
+| `F10` / `Ctrl+t` | 半角abc |
+| `Space` | 変換 — kanji candidates |
+| `Tab` | prediction |
+
+`Hiragana` / `Katakana` / `Eisu` / `Muhenkan` are physical JIS keys, so on a US
+keyboard `F6`–`F10` is the way in.
+
+### Nepali — MPP romanized layout
+
+`ne-rom` is a *fixed keyboard layout*, not a transliteration like Lekhika: each
+key produces one glyph, there is no candidate list, and **case matters**.
+Uppercase generally gives independent vowels and aspirates, lowercase gives
+consonants and vowel *signs* (matras).
+
+Consonants (mostly lowercase — note `c`/`C` and `s`/`z` invert the usual case):
+
+```
+ k क    K ख    g ग    G घ    < ङ
+ c छ    C च    j ज    J झ    Y ञ
+ q ट    Q ठ    x ड    X ढ    N ण
+ t त    T थ    d द    D ध    n न
+ p प    P फ    b ब    B भ    m म
+ y य    r र    l ल    v व
+ s स    S श    z ष    h ह
+```
+
+Vowels — independent (upper) vs. vowel sign / matra (lower):
+
+```
+ H अ    A आ    a ा
+ [ इ    { ई    i ि    I ी
+ f उ    F ऊ    u ु    U ू
+ Z ऋ    R ृ
+ ] ए    } ऐ    e े    E ै
+ O ओ    W औ    o ो    w ौ
+```
+
+Marks and punctuation:
+
+```
+ M ं  (anusvara)    V ँ  (candrabindu)   / ्  (halant)
+ . ।  (danda)       > ॥  (double danda)  | ः  (visarga)
+ ~ ऽ                ` ़  (nukta)         \ ॐ    $ रु
+ 0-9 → ०-९
+```
+
+Note the halant: consonant clusters need `/` (्). So `k a Q m a x w M` is
+क + ा + ठ + म + ा + ड + ौ + ं = **काठमाडौं**; `n e p a l` is **नेपाल**; and
+`n m s / t e` is **नमस्ते** (न + म + स + ् + त + े). Plain `n m s t e` gives
+नमसते. The authoritative map is `/usr/share/m17n/ne-rom.mim`.
 
 Notes:
 
-- Both groups use the `us` XKB layout, not `np`. Both engines consume ASCII
-  keys and transliterate themselves, so handing Lekhika an already-remapped
-  Devanagari keymap would break it. This is why Nepali here is romaji rather
-  than a physical Nepali layout; switch to `input.kb_layout = "us,np"` in
-  `hypr/hyprland.lua` if you want the physical layout instead.
-- The Nepali engine is **AUR-only and compiled from source** (`liblekhika-git`,
-  `fcitx5-lekhika-git`) — upstream removed its prebuilt-binary workflow. It is
-  a young project with no support commitment, so `setup.sh` treats a build
-  failure as non-fatal and leaves Japanese working. Remove with
-  `yay -Rns fcitx5-lekhika-git liblekhika-git`.
-- Transliteration is rules-based and works with **no dictionary at all**. The
-  113 MB pre-trained word-suggestion DB is opt-in: `./setup.sh --dictionary`.
-- The group item is named `fcitx5lekhika` in `profile`, from the upstream
-  `UniqueName`. The display name ("Lekhika Nepali Input Method") and the bare
-  word `lekhika` both fail silently, leaving an unselectable group.
-- The active IM and mode are shown in the indicator
-  (`ShowInputMethodInformation`) — worth having with two groups, since the
-  group name alone does not tell you whether the IME is on.
+- The group uses the `us` XKB layout, even for Nepali. `ne-rom` maps the ASCII
+  keysyms of a US layout to Devanagari, so it needs plain US keys, not an `np`
+  keymap. Fcitx's XKB-layout management only works on KDE/GNOME anyway; on
+  Hyprland the group layout must match `input.kb_layout`, which here inherits
+  `XKB_DEFAULT_LAYOUT = us`.
+- The Nepali item is named `m17n_ne_rom`. `fcitx5-m17n` builds entry names as
+  `m17n_<lang>_<name>` (`im/engine.cpp`), so it is not the bare `ne-rom`. Other
+  Nepali engines `m17n-db` ships: `m17n_ne_rom_translit` (Google-style
+  transliteration), `m17n_ne_trad` and `m17n_ne_trad_ttf` (MPP traditional).
+- Lekhika was dropped in favour of `ne-rom`. If it is still installed, remove it
+  with `yay -Rns fcitx5-lekhika-git liblekhika-git` (and delete
+  `~/.local/share/lekhika-core`).
+- fcitx5-m17n labels every m17n entry `"<name> (M17N)"`, so `ne-rom` would show
+  as the ugly `rom (M17N)`. The display name is fixed with a user override: copy
+  `/usr/share/fcitx5/m17n/default` to `~/.local/share/fcitx5/m17n/default`
+  (fcitx5-m17n *replaces* the system file, it does not merge it) and change
+  `ne:rom:1` to `ne:rom:1:Nepali (MPP Romanized)`. That override is already in
+  place on this machine; re-create it after an `m17n-db` upgrade that changes
+  the list.
+- The active IM and mode are shown in the transient indicator
+  (`ShowInputMethodInformation`) on each switch — the closest thing to macOS'
+  menu-bar あ/A badge. DMS' bar has no persistent fcitx widget.
 - IME is disabled in password fields, so a half-typed romaji preedit cannot be
   committed into a password prompt.
-- `GTK_IM_MODULE`/`QT_IM_MODULE` are set globally for Fcitx5 features and
-  XWayland compatibility. If the candidate window flickers in Wayland-native
-  GTK apps, drop `GTK_IM_MODULE` from `hypr/hyprland.lua` and leave the rest.
+- **`GTK_IM_MODULE` is deliberately not set.** Per the fcitx5 "Using Fcitx 5 on
+  Wayland" guide, GTK3/4 reach fcitx through text-input-v3, and a global
+  `GTK_IM_MODULE` is the documented cause of the candidate window blinking. The
+  im module is requested per-toolkit via `gtk-im-module=fcitx` in
+  `~/.config/gtk-3.0/settings.ini` and `~/.config/gtk-4.0/settings.ini` instead.
+  `QT_IM_MODULE` stays set (needed on non-KDE for Qt < 6.7), as do
+  `SDL_IM_MODULE` and `XMODIFIERS` (for XWayland).
 - Profile/config are **copied**, not symlinked, by `setup.sh`. Fcitx5 rewrites
   `~/.config/fcitx5/*` on exit, so a symlink would leave the dotfiles repo
   permanently dirty. Stop Fcitx5 from the tray before editing those by hand.
-- Requires `noto-fonts-cjk` for Japanese glyphs; `setup.sh` warns if missing.
+- Requires `noto-fonts-cjk` for Japanese glyphs and `noto-fonts` for Devanagari;
+  `setup.sh` warns if either is missing.
 - Check status with `fcitx5-remote` (`1` = ASCII, `2` = IME on); diagnose with
   `fcitx5-diagnose`.
 

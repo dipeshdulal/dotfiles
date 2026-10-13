@@ -12,16 +12,25 @@ hl.on("hyprland.start", function()
 end)
 -- DMS_STARTUP_END
 
--- Japanese + Nepali input (Fcitx5 + Mozc + Lekhika, romaji). Packages,
--- profile and hotkeys come from ../fcitx5/ -- see that directory's setup.sh.
+-- Japanese + Nepali input (Fcitx5 + Mozc + m17n ne-rom). Packages, profile
+-- and hotkeys come from ../fcitx5/ -- see that directory's setup.sh.
+--
+-- Hyprland speaks the native Wayland input-method and text-input-v3 protocols,
+-- so fcitx5 needs no env var for native Wayland apps (it logs "Using Wayland
+-- native input method protocol: 1").
+--
+-- GTK_IM_MODULE is deliberately NOT set. Per the fcitx5 "Using Fcitx 5 on
+-- Wayland" guide, GTK3/4 should reach fcitx through text-input-v3, and a
+-- global GTK_IM_MODULE is the documented cause of the candidate window
+-- blinking under Wayland. GTK apps that still need the im module (X11/XWayland)
+-- get it from gtk-im-module=fcitx in ~/.config/gtk-3.0/settings.ini and
+-- ~/.config/gtk-4.0/settings.ini instead.
 --
 -- The module name is "fcitx", not "fcitx5": that is the identifier shipped by
--- fcitx5-gtk / fcitx5-qt. Wayland-native GTK4/Qt6 apps use text-input-v3 and
--- work without GTK_IM_MODULE, but setting it globally gives full Fcitx
--- features and is what XWayland apps need. Trade-off: if the candidate window
--- flickers in Wayland-native GTK apps, drop GTK_IM_MODULE here and leave the
--- others set. SDL_IM_MODULE covers games built against older SDL2.
-hl.env("GTK_IM_MODULE", "fcitx")
+-- fcitx5-gtk / fcitx5-qt. QT_IM_MODULE is required on non-KDE compositors for
+-- Qt < 6.7 (Qt only speaks text-input-v2, which only KWin implements);
+-- SDL_IM_MODULE covers games built against older SDL2; XMODIFIERS is for
+-- XWayland apps.
 hl.env("QT_IM_MODULE", "fcitx")
 hl.env("SDL_IM_MODULE", "fcitx")
 hl.env("XMODIFIERS", "@im=fcitx")

@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
-# Japanese + Nepali romaji input: Fcitx5 + Mozc + Lekhika.
+# Japanese + Nepali input: Fcitx5 + Mozc + m17n (ne-rom).
 #
-# Installs the packages listed in packages.txt (official repos) and
-# packages-aur.txt (AUR, compiled from source), then seeds
-# ~/.config/fcitx5 from the files in this directory. The Hyprland side
-# (GTK_IM_MODULE and friends, plus the autostart) lives in
+# Installs the packages listed in packages.txt -- all from the official
+# repos, no AUR -- then seeds ~/.config/fcitx5 from the files in this
+# directory. The Hyprland side (env vars and autostart) lives in
 # ../hypr/hyprland.lua.
 #
 # Usage:
-#   ./setup.sh              install + seed config
-#   ./setup.sh --dictionary  also download the 113 MB word-suggestion DB
+#   ./setup.sh
 #
 # Safe to re-run. An existing ~/.config/fcitx5 is never overwritten: fcitx5
 # owns those files once it has run and rewrites them on exit, so this only
@@ -19,15 +17,8 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Where lekhika's core expects to find the pre-trained dictionary.
-LEKHIKA_DICT_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/lekhika-core"
-LEKHIKA_DICT="$LEKHIKA_DICT_DIR/lekhikadict.akshardb"
-LEKHIKA_DICT_URL='https://github.com/khumnath/fcitx5-lekhika/releases/download/dictionary/lekhikadict.akshardb'
-
-want_dictionary=false
 for arg in "$@"; do
   case "$arg" in
-    --dictionary) want_dictionary=true ;;
     -h | --help)
       sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
       exit 0
@@ -39,16 +30,11 @@ for arg in "$@"; do
   esac
 done
 
-# shellcheck disable=SC2046  # intentional word-splitting of the package list
-packages=$(grep -vE '^[[:space:]]*(#|$)' "$HERE/packages.txt")
-# shellcheck disable=SC2046
-aur_packages=$(grep -vE '^[[:space:]]*(#|$)' "$HERE/packages-aur.txt")
-
 # --- Privilege gate --------------------------------------------------------
 #
 # `sudo -n true` NEVER prompts and NEVER counts as an authentication attempt.
-# Running the real work without a cached credential instead means pacman/yay
-# ask via $SUDO_ASKPASS, and each empty or wrong answer spends one of the three
+# Running the real work without a cached credential instead means pacman asks
+# via $SUDO_ASKPASS, and each empty or wrong answer spends one of the three
 # pam_faillock strikes this machine allows (deny=3). Three of those lock the
 # account for unlock_time=600s, and pam_faillock.so preauth then rejects even
 # the correct password everywhere -- terminals included. See
@@ -72,74 +58,20 @@ EOF
   exit 1
 fi
 
-# --- Official repositories -------------------------------------------------
+# --- Install ---------------------------------------------------------------
+# shellcheck disable=SC2046  # intentional word-splitting of the package list
+packages=$(grep -vE '^[[:space:]]*(#|$)' "$HERE/packages.txt")
 echo "==> fcitx5: installing packages from the official repos"
 # shellcheck disable=SC2086
 sudo pacman -S --needed --noconfirm $packages
 
-# --- AUR (compiled from source) -------------------------------------------
-#
-# Deliberately non-fatal: the Nepali engine is the newest and least
-# packaged piece here. If it fails to build, Japanese still works and the
-# Nepali group can simply be left alone.
-echo "==> fcitx5: installing the Nepali engine from the AUR"
-aur_ok=true
-if command -v yay >/dev/null 2>&1; then
-  # shellcheck disable=SC2086
-  yay -S --needed --noconfirm $aur_packages || aur_ok=false
-else
-  aur_ok=false
-  cat >&2 <<'EOF'
-
-  WARNING: no AUR helper found, so the Nepali engine was skipped.
-           Install one (e.g. `sudo pacman -S paru` or `yay`), then run:
-             yay -S liblekhika-git fcitx5-lekhika-git
-
-EOF
-fi
-
-# The authoritative check is the inputmethod descriptor that
-# fcitx5-lekhika installs, not the exit status above.
-lekhika_conf=/usr/share/fcitx5/inputmethod/fcitx5lekhika.conf
-if [[ ! -f $lekhika_conf ]]; then
-  aur_ok=false
-  cat >&2 <<EOF
-
-  WARNING: the Nepali engine is not installed ($lekhika_conf is missing),
-           but ./profile lists fcitx5lekhika as the Nepali group's input
-           method. Fcitx5 does not crash on this -- it logs
-           "Group Item fcitx5lekhika ... is not valid. Removed." and the
-           Nepali group degenerates into a second, redundant US keyboard
-           group that Ctrl+Shift+Space will still cycle to.
-
-           Once the build succeeds, re-seed so the profile takes effect:
-             rm ~/.config/fcitx5/profile && ./setup.sh
-
-EOF
-fi
-
-# --- Optional dictionary ---------------------------------------------------
-if [[ $want_dictionary == true ]]; then
-  if [[ -s $LEKHIKA_DICT ]]; then
-    echo "==> lekhika: dictionary already present, skipping"
-  else
-    echo "==> lekhika: downloading word-suggestion dictionary (113 MB)"
-    mkdir -p "$LEKHIKA_DICT_DIR"
-    # -C - so an interrupted download resumes instead of restarting.
-    curl -fL --progress-bar -C - -o "$LEKHIKA_DICT" "$LEKHIKA_DICT_URL" || {
-      rm -f "$LEKHIKA_DICT"
-      echo "==> lekhika: dictionary download failed" >&2
-    }
-  fi
-fi
-
-# --- Seed config ----------------------------------------------------------
+# --- Seed config -----------------------------------------------------------
 if pgrep -x fcitx5 >/dev/null 2>&1; then
   cat <<'EOF'
 
-  note: fcitx5 is already running. Stop it from the tray icon (or `fcitx5-rm`)
-        before hand-editing ~/.config/fcitx5, otherwise its save-on-exit will
-        overwrite the changes.
+  note: fcitx5 is already running. Stop it from the tray icon (or
+        `fcitx5-remote -e`) before hand-editing ~/.config/fcitx5, otherwise
+        its save-on-exit will overwrite the changes.
 
 EOF
 fi
@@ -173,27 +105,20 @@ just start fcitx5 for this session (it autostarts on future logins):
 
 Then:
 
-  Ctrl+Space         toggle the IME in the current language
-  Ctrl+Shift+Space   switch language:  Japanese  <->  Nepali
+  Ctrl+Space         next language:  U.S. -> Japanese -> Nepali -> U.S.
+  Ctrl+Shift+Space   previous language
 
-Japanese: Ctrl+Space, type `nihongo`, press Space to convert.
+Japanese: Ctrl+Space until the indicator shows the Japanese engine, type
+`nihongo`, press Space to convert. While composing, F6..F10 switch
+hiragana / katakana / half-width (see ../README.md).
 
-Check the current state any time with `fcitx5-remote` (1 = ASCII,
-2 = IME on). Run `fcitx5-diagnose` if anything misbehaves.
+Nepali: Ctrl+Space again. m17n's ne-rom is the MPP romanized *layout* -- one
+key per glyph, not a transliteration:
+
+  k a Q m a x w M   ->   काठमाडौं
+  n e p a l         ->   नेपाल
+  n m s / t e       ->   नमस्ते
 EOF
-
-if [[ $aur_ok == true ]]; then
-  cat <<'EOF'
-
-Nepali: Ctrl+Shift+Space, Ctrl+Space, type `namaste`, press Space.
-EOF
-else
-  cat <<'EOF'
-
-Nepali is NOT usable yet -- see the warnings above. Only Japanese is
-working at this point; Ctrl+Shift+Space is not needed for it.
-EOF
-fi
 
 if ! fc-list :lang=ja >/dev/null 2>&1; then
   cat <<'EOF'
@@ -203,11 +128,10 @@ note: no CJK font found, so Japanese will render as boxes:
 EOF
 fi
 
-if [[ $want_dictionary != true && $aur_ok == true ]]; then
+if ! fc-list :lang=ne >/dev/null 2>&1; then
   cat <<'EOF'
 
-The Nepali engine transliterates correctly without any dictionary; the
-database only adds word suggestions. To add them later:
-  ./setup.sh --dictionary
+note: no Devanagari font found, so Nepali will render as boxes:
+  sudo pacman -S noto-fonts
 EOF
 fi

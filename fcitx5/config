@@ -1,47 +1,58 @@
-# Global Fcitx5 options -- Japanese + Nepali romaji input.
+# Global Fcitx5 options -- Japanese + Nepali input.
 #
 # Seeded (copied, not symlinked) into ~/.config/fcitx5 by ./setup.sh, for the
 # same save-on-exit reason as ./profile.
+#
+# One group, one key: Ctrl+Space walks the group's input methods
+# (U.S. -> Mozc -> Nepali -> U.S.), matching how macOS/iOS cycle input
+# sources. Ctrl+Shift+Space walks back (U.S. -> Nepali -> Mozc).
 
 [Hotkey/TriggerKeys]
-# Ctrl+Space toggles the IME on/off inside the active group, i.e.
-# ASCII <-> mozc (Japanese) or ASCII <-> fcitx5lekhika (Nepali).
-# Hyprland does not bind it, so fcitx5 receives the chord directly:
-# Super+Space is DMS spotlight and Alt+Space is DMS spotlight-bar, but
-# Ctrl+Space is free (verified with `hyprctl binds -j`).
+# Intentionally EMPTY.
+#
+# fcitx's built-in default here is Ctrl+Space, and this list is matched
+# BEFORE EnumerateForwardKeys below -- leaving it set would swallow the
+# chord and fcitx would toggle on/off instead of walking the list. With
+# every language in one group the "off" state is just the keyboard-us
+# item, so the toggle is redundant and only gets in the way.
 #
 # Deliberately NOT setting AltTriggerKeys=Shift_L (a common preference for
 # toggling on a bare left Shift). binds-user.lua uses Shift+Home +
 # BackSpace for Super+Backspace line editing, and a bare-Shift IME trigger
 # would fight it.
-0=CTRL+space
 
 [Hotkey/AltTriggerKeys]
 
 [Hotkey/EnumerateForwardKeys]
+# Walk to the next input method in the group: U.S. -> Mozc -> Nepali -> U.S.
+# Hyprland does not bind Ctrl+Space, so fcitx receives the chord directly
+# (Super+Space is DMS spotlight and Alt+Space is DMS spotlight-bar, but
+# Ctrl+Space is free -- verified with `hyprctl binds -j`). This is macOS's
+# Ctrl+Space.
+#
+# SPELLING MATTERS. Fcitx's key parser (fcitx-utils/key.cpp) only recognises
+# "Control+" / "CTRL_", "Shift+" / "SHIFT_", "Super+" / "SUPER_" -- mixed
+# case, or all-caps with a trailing underscore. There is no "CTRL+" form:
+# "CTRL+space" matches no modifier, fails to resolve as a key, and is stored
+# as an *empty* binding, silently disabling the shortcut. (This file used to
+# say CTRL+space and CTRL+SHIFT+space, which is why neither key did anything.)
+0=Control+space
 
 [Hotkey/EnumerateBackwardKeys]
+# Walk back: U.S. -> Nepali -> Mozc. Reuses the chord the old two-group
+# setup spent on group switching.
+0=Control+Shift+space
 
 [Hotkey/EnumerateGroupForwardKeys]
-# Ctrl+Shift+Space moves between the two groups in ./profile
-# (Japanese <-> Nepali).
-#
-# This MUST be set. Fcitx5's built-in default is Super+Space, which is
-# already bound to DMS spotlight on this machine, so leaving the default
-# would make the Nepali group unreachable. Ctrl+Shift+Space was verified
-# unbound via `hyprctl binds -j`.
-0=CTRL+SHIFT+space
 
 [Hotkey/EnumerateGroupBackwardKeys]
-# Intentionally empty. With two groups, forward already wraps around,
-# and the natural pairing candidate here (Ctrl+Shift+Shift+Space) is not
-# expressible as a distinct chord.
+# Both empty: there is only one group, so there is nothing to switch
+# between. (Fcitx's built-in default for the forward key is Super+Space,
+# which DMS spotlight already owns; leaving it here would be dead weight.)
 
 [Behavior]
 # Show which IM is active and its mode, so there is a visible cue for
 # Japanese vs. Nepali vs. direct input beyond the candidate window.
-# This matters more now that there are two groups: the group name alone
-# does not tell you whether the IME is currently on.
 ShowInputMethodInformation=True
 CompactInputMethodInformation=True
 DefaultPageSize=5

@@ -1,16 +1,18 @@
-# Japanese input: Fcitx5 framework + Mozc (Google Japanese Input) as the
-# romaji -> kana/kanji conversion engine. The Hyprland side (env vars and
-# autostart) lives in ../hypr/hyprland.lua, not here.
-#
-# NOTE: these are official-repo packages only. The Nepali engine is an AUR
-# package and is listed separately in packages-aur.txt -- putting it here
-# would make `pacman -S` fail on an unknown target.
+# Japanese + Nepali input: Fcitx5 framework, Mozc (Google Japanese Input) as
+# the romaji -> kana/kanji engine, and m17n for Nepali. All official-repo
+# packages -- no AUR. The Hyprland side (env vars and autostart) lives in
+# ../hypr/hyprland.lua, not here.
 fcitx5
 fcitx5-mozc
 
+# Nepali. m17n-db carries the MPP "ne-rom" romanized layout; fcitx5-m17n
+# exposes it to fcitx5 as the input method m17n_ne_rom.
+fcitx5-m17n
+m17n-db
+
 # GTK/Qt IM modules. Wayland-native GTK4/Qt6 apps use text-input-v3 and do
-# not strictly need these, but XWayland apps do -- and the *_IM_MODULE env
-# vars are set globally in ../hypr/hyprland.lua, so the modules must exist.
+# not strictly need these, but XWayland apps do -- QT_IM_MODULE and
+# XMODIFIERS are set in ../hypr/hyprland.lua, so the modules must exist.
 fcitx5-gtk
 fcitx5-qt
 
