@@ -70,6 +70,29 @@ if [[ -f $HOME/.bashrc ]] && ! grep -q "herdr-sessionizer" "$HOME/.bashrc"; then
   echo "  add    ~/.bashrc alias f"
 fi
 
+# fzf key bindings (Ctrl+R history, Ctrl+T files, Alt+C cd). Omarchy sources
+# fzf's completion but not its key bindings, so Ctrl+R does nothing by default.
+if [[ -f $HOME/.bashrc ]] && ! grep -q "fzf/key-bindings.bash" "$HOME/.bashrc"; then
+  printf '\n# fzf key bindings: Ctrl+R history, Ctrl+T files, Alt+C cd.\n[[ -r /usr/share/fzf/key-bindings.bash ]] && source /usr/share/fzf/key-bindings.bash\n' >>"$HOME/.bashrc"
+  echo "  add    ~/.bashrc fzf key bindings"
+fi
+
+# Bash completions for tools that ship none in bash-completion. These live in
+# the per-user dir, which bash-completion loads lazily by command name.
+echo "completions"
+comp_dir="$HOME/.local/share/bash-completion/completions"
+mkdir -p "$comp_dir"
+gen_completion() {
+  local cmd="$1"
+  shift
+  command -v "$cmd" >/dev/null 2>&1 || return 0
+  [[ -s "$comp_dir/$cmd" ]] && return 0
+  "$@" >"$comp_dir/$cmd" 2>/dev/null && echo "  gen    $cmd" || rm -f "$comp_dir/$cmd"
+}
+gen_completion herdr herdr completion bash
+gen_completion mise mise completion bash
+gen_completion gh gh completion -s bash
+
 echo "tmux"
 link tmux/tmux.conf "$HOME/.tmux.conf"
 
