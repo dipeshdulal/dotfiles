@@ -65,7 +65,8 @@ inside the single persistent, agent-aware [herdr](https://herdr.dev) session. A
 port of ThePrimeagen's
 [`tmux-sessionizer`](https://github.com/ThePrimeagen/.dotfiles/blob/master/bin/.local/scripts/tmux-sessionizer)
 where each project becomes a herdr *workspace* rather than a tmux session.
-Requires `fzf` and `jq`. Bound to `f` in `zsh/zshrc`.
+Requires `fzf` and `jq`. Bound to `f` in `zsh/zshrc`, and added to
+`~/.bashrc` by `install.sh` on bash machines (Omarchy's default shell).
 
 ## herdr / rex navigation
 
@@ -97,16 +98,22 @@ two machines need different things. `install.sh` picks a branch by testing for
 `/usr/share/omarchy`:
 
 **Omarchy** (`hypr/omarchy/`) — only the override files are linked; Omarchy
-keeps ownership of `hyprland.lua`, `input.lua`, `looknfeel.lua` and
-`autostart.lua`, so `omarchy refresh hyprland` can still reset those safely.
+keeps ownership of `hyprland.lua`, `input.lua` and `autostart.lua`, so
+`omarchy refresh hyprland` can still reset those safely.
 
-- `hypr/omarchy/monitors.lua` — ultrawide on the left at 144 Hz, 1080p on the
-  right rotated to portrait (`transform = 1`), workspaces 1–5 on the ultrawide
-  and 6–10 on the portrait panel. Also sets `GDK_SCALE=1`, since the template
-  default of 2 double-scales GTK3 apps on 1x displays.
-- `hypr/omarchy/bindings.lua` — `SUPER+E` opens Nautilus; window focus moves to
-  `SUPER+HJKL` (which takes J/K/L back from toggle-split, the keybindings menu
-  and layout-toggle).
+- `hypr/omarchy/monitors.lua` — ultrawide on the left at 3440x1440@144, 1080p on
+  the right rotated to portrait (`transform = 3`, i.e. 270°), both top-aligned at
+  `y=0`. Workspaces 1–5 on the ultrawide, 6–10 on the portrait panel. Also sets
+  `GDK_SCALE=1`, since the template default of 2 double-scales GTK3 apps on 1x
+  displays.
+- `hypr/omarchy/bindings.lua` — `SUPER+E` opens Flea; window focus moves to
+  `SUPER+HJKL` and `SUPER+SHIFT+HJKL` moves windows (both take J/K/L back from
+  toggle-split, the keybindings menu and layout-toggle). Also `SUPER+Q` to close,
+  `SUPER+F1` for the keybinding cheat sheet, and omasnap on
+  `PRINT`/`CTRL+PRINT`/`ALT+PRINT` — gated on omasnap being installed, with
+  Omarchy's OCR bind left intact.
+- `hypr/omarchy/looknfeel.lua` — 1px gaps and a 1px window border, with
+  `gaps_out` giving 8px on the left/right screen edges only.
 
 **Bare Hyprland + DMS** (`hypr/`, the archtower setup):
 

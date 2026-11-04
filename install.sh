@@ -63,6 +63,13 @@ echo "zsh"
 link zsh/zshrc "$HOME/.zshrc"
 link zsh/p10k.zsh "$HOME/.p10k.zsh"
 
+# Omarchy defaults to bash, where the zsh alias above does nothing.
+echo "bash"
+if [[ -f $HOME/.bashrc ]] && ! grep -q "herdr-sessionizer" "$HOME/.bashrc"; then
+  printf '\n# Fuzzy-pick a project and open it as a herdr workspace.\nalias f="bash ~/.local/bin/herdr-sessionizer.sh"\n' >>"$HOME/.bashrc"
+  echo "  add    ~/.bashrc alias f"
+fi
+
 echo "tmux"
 link tmux/tmux.conf "$HOME/.tmux.conf"
 
@@ -71,8 +78,9 @@ if [[ -d /usr/share/omarchy ]]; then
   # Omarchy owns hyprland.lua and the rest of the defaults, so only our
   # override files are linked. `omarchy refresh hyprland` restores the
   # package versions if these ever need to be reset.
-  link hypr/omarchy/monitors.lua "$HOME/.config/hypr/monitors.lua"
-  link hypr/omarchy/bindings.lua "$HOME/.config/hypr/bindings.lua"
+  link hypr/omarchy/monitors.lua  "$HOME/.config/hypr/monitors.lua"
+  link hypr/omarchy/bindings.lua  "$HOME/.config/hypr/bindings.lua"
+  link hypr/omarchy/looknfeel.lua "$HOME/.config/hypr/looknfeel.lua"
 else
   # Bare Hyprland + DMS (the archtower setup).
   link hypr/hyprland.lua       "$HOME/.config/hypr/hyprland.lua"

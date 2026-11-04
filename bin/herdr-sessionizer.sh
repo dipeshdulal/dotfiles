@@ -6,7 +6,18 @@
 # Port of tmux-sessionizer (ThePrimeagen) to herdr:
 #   tmux session  ->  herdr workspace (project = workspace, all in one session)
 
-selected=$(find ~/projects -mindepth 1 -maxdepth 2 -type d | fzf)
+# Project roots: archtower used ~/projects, Omarchy keeps ~/Projects.
+roots=()
+for d in "$HOME/projects" "$HOME/Projects"; do
+  [[ -d $d ]] && roots+=("$d")
+done
+
+if (( ${#roots[@]} == 0 )); then
+  echo "herdr-sessionizer: no project directory (~/projects or ~/Projects)" >&2
+  exit 1
+fi
+
+selected=$(find "${roots[@]}" -mindepth 1 -maxdepth 2 -type d 2>/dev/null | fzf)
 
 if [[ -z $selected ]]; then
   exit 0

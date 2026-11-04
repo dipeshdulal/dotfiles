@@ -1,46 +1,46 @@
 onboarding = false
 
+[theme]
+# Kept on the terminal's own palette (what this machine already used).
+# archtower used a catppuccin-macchiato palette; it is preserved at the bottom
+# of this file if you ever want it back.
+name = "terminal"
+
+[theme.custom]
+# The active tab is drawn as panel_bg text on an accent background, so panel_bg
+# has to be dark for it to read.
+panel_bg = "black"
+
+[terminal]
+# Follow the pane's cwd on every split, tab and workspace, like tmux's
+# -c "#{pane_current_path}".
+new_cwd = "follow"
+
 [ui]
 show_agent_labels_on_pane_borders = true
-pane_gaps = false   # panes sit flush (border only), no blank gutter between them
+accent = "blue"
 
-[theme]
-# Base is "catppuccin" (Mocha); the tokens below override it to opencode's
-# built-in "catppuccin-macchiato" palette so Herdr chrome matches the opencode
-# panes. Source of truth: opencode theme `catppuccin-macchiato` (macchiato roles).
-name = "catppuccin"
-auto_switch = false
+# Panes sit flush (border only), no blank gutter between them.
+pane_gaps = false
+pane_outer_borders = false
+pane_scrollbars = false
 
-# opencode role -> herdr token:
-#   background        -> panel_bg
-#   backgroundPanel   -> sidebar_bg
-#   backgroundElement -> active_row_bg
-#   border            -> selection_bg / surface0
-#   primary           -> accent
-#   text / textMuted  -> text / subtext0
-[theme.custom]
-panel_bg      = "#24273a"  # macBase
-sidebar_bg    = "#1e2030"  # macMantle
-active_row_bg = "#181926"  # macCrust
-selection_bg  = "#363a4f"  # macSurface0
-surface0      = "#363a4f"  # macSurface0
-surface1      = "#494d64"  # macSurface1
-surface_dim   = "#1e2030"  # macMantle
-overlay0      = "#6e738d"  # macOverlay0
-overlay1      = "#8087a2"  # macOverlay1
-text          = "#cad3f5"  # macText
-subtext0      = "#a5adcb"  # macSubtext0
-accent        = "#c6a0f6"  # macMauve (opencode primary)
-mauve         = "#c6a0f6"  # macMauve
-green         = "#a6da95"  # macGreen
-yellow        = "#eed49f"  # macYellow
-red           = "#ed8796"  # macRed
-blue          = "#8aadf4"  # macBlue
-teal          = "#8bd5ca"  # macTeal
-peach         = "#f5a97f"  # macPeach
+# Closing never asked for confirmation in tmux.
+confirm_close = false
+prompt_new_tab_name = false
+
+# set -g mouse on
+mouse_capture = true
+
+# status-right had the zoom flag followed by #h
+tab_bar_right = [{ type = "zoom" }, { type = "hostname" }]
+
+# set -g set-titles on / set-titles-string '#h:#W'
+window_title = "{hostname}: {workspace}"
 
 [keys]
-# tmux-aligned bindings. Prefix stays ctrl+b (same as tmux).
+# tmux-aligned bindings. Prefix stays ctrl+b (same as tmux). The Omarchy
+# default was ctrl+space, which collides with the fcitx5 input-method toggle.
 prefix = "ctrl+b"
 
 # Overrides where herdr's default differs from canonical tmux:
@@ -48,9 +48,10 @@ detach = "prefix+d"            # tmux: prefix d   (herdr default was prefix+q)
 rename_tab = "prefix+comma"    # tmux: prefix ,   (herdr default was prefix+shift+t)
 close_tab = "prefix+ampersand" # tmux: prefix &   (herdr default was prefix+shift+x)
 
-# Direct ctrl+h/j/k/l is handled by the vim-herdr-navigation plugin
-# (see [[keys.command]] at the bottom) so it also drives nvim splits seamlessly.
-# Keep prefix+h/j/k/l as a fallback to step out of non-vim TUIs (lazygit, k9s...).
+# Direct ctrl+h/j/k/l is handled by the vim-herdr-navigation plugin (see the
+# commented [[keys.command]] blocks at the bottom) so it also drives nvim
+# splits seamlessly. Keep prefix+h/j/k/l as a fallback to step out of non-vim
+# TUIs (lazygit, k9s...).
 focus_pane_left = "prefix+h"
 focus_pane_down = "prefix+j"
 focus_pane_up = "prefix+k"
@@ -69,54 +70,81 @@ help = "prefix+?"              # tmux: prefix ?
 split_vertical = "prefix+|"    # prefix + |  (tmux-plugin convention)
 split_horizontal = "prefix+minus"
 
-# Seamless ctrl+h/j/k/l across herdr panes AND nvim splits, via the
-# vim-herdr-navigation plugin. The action checks the focused pane's process:
-# if it's vim/nvim it forwards the key; otherwise it moves the herdr pane.
-[[keys.command]]
-key = "ctrl+h"
-type = "plugin_action"
-command = "vim-herdr-navigation.left"
-description = "navigate left (vim/herdr)"
-
-[[keys.command]]
-key = "ctrl+j"
-type = "plugin_action"
-command = "vim-herdr-navigation.down"
-description = "navigate down (vim/herdr)"
-
-[[keys.command]]
-key = "ctrl+k"
-type = "plugin_action"
-command = "vim-herdr-navigation.up"
-description = "navigate up (vim/herdr)"
-
-[[keys.command]]
-key = "ctrl+l"
-type = "plugin_action"
-command = "vim-herdr-navigation.right"
-description = "navigate right (vim/herdr)"
-
-# Sidebar agent rows.
-# Line 1 is the live terminal title -- what the agent is actually working on --
-# so it gets the top line AND the primary style. Herdr normally paints
-# terminal_title with its secondary/custom style (theme overlay0), which left
-# the top line dimmer than the workspace under it. The fg/bold override below
-# promotes it to the row's name style (theme text, bold) instead.
-# Line 2 is only WHERE the agent lives (workspace). It is secondary context, so
-# it is demoted to the overlay0 colour and stripped of its name-style bold. It
-# collapses when empty.
-[ui.sidebar.agents]
-rows = [
-  ["state_icon", { token = "terminal_title_stripped", fg = "#cad3f5", bold = true }],
-  [{ token = "workspace", fg = "#6e738d", bold = false }],
-]
-
-# Agents that report no terminal title would leave line 1 blank, so they fall
-# back to their name/kind on line 1, styled like the title above.
-[ui.sidebar.agents.rows_by_agent]
-claude = [["state_icon", { token = "agent", fg = "#cad3f5", bold = true }], [{ token = "workspace", fg = "#6e738d", bold = false }]]
-pi = [["state_icon", { token = "agent", fg = "#cad3f5", bold = true }], [{ token = "workspace", fg = "#6e738d", bold = false }]]
+# ---------------------------------------------------------------------------
+# Disabled until vim-herdr-navigation is restored.
+#
+# These four binds forward ctrl+h/j/k/l into nvim splits when the focused pane
+# is vim/nvim, and otherwise move the herdr pane. The plugin lived at
+# ~/projects/vim-herdr-navigation on archtower and is inside
+# ~/Backups/archtower/archtower-home-*.tar.zst. Restore it, run
+#   herdr plugin link <path>
+# then uncomment. Without the plugin these binds error on every keypress.
+#
+# [[keys.command]]
+# key = "ctrl+h"
+# type = "plugin_action"
+# command = "vim-herdr-navigation.left"
+# description = "navigate left (vim/herdr)"
+#
+# [[keys.command]]
+# key = "ctrl+j"
+# type = "plugin_action"
+# command = "vim-herdr-navigation.down"
+# description = "navigate down (vim/herdr)"
+#
+# [[keys.command]]
+# key = "ctrl+k"
+# type = "plugin_action"
+# command = "vim-herdr-navigation.up"
+# description = "navigate up (vim/herdr)"
+#
+# [[keys.command]]
+# key = "ctrl+l"
+# type = "plugin_action"
+# command = "vim-herdr-navigation.right"
+# description = "navigate right (vim/herdr)"
+# ---------------------------------------------------------------------------
 
 [experimental]
 # Enable Kitty graphics protocol support for inline images in Herdr panes.
 kitty_graphics = true
+
+# ---------------------------------------------------------------------------
+# Preserved from the archtower config, inactive. Swap it in by replacing the
+# [theme] block above.
+#
+# [theme]
+# name = "catppuccin"
+# auto_switch = false
+#
+# [theme.custom]
+# panel_bg      = "#24273a"  # macBase
+# sidebar_bg    = "#1e2030"  # macMantle
+# active_row_bg = "#181926"  # macCrust
+# selection_bg  = "#363a4f"  # macSurface0
+# surface0      = "#363a4f"  # macSurface0
+# surface1      = "#494d64"  # macSurface1
+# surface_dim   = "#1e2030"  # macMantle
+# overlay0      = "#6e738d"  # macOverlay0
+# overlay1      = "#8087a2"  # macOverlay1
+# text          = "#cad3f5"  # macText
+# subtext0      = "#a5adcb"  # macSubtext0
+# accent        = "#c6a0f6"  # macMauve
+# mauve         = "#c6a0f6"  # macMauve
+# green         = "#a6da95"  # macGreen
+# yellow        = "#eed49f"  # macYellow
+# red           = "#ed8796"  # macRed
+# blue          = "#8aadf4"  # macBlue
+# teal          = "#8bd5ca"  # macTeal
+# peach         = "#f5a97f"  # macPeach
+#
+# [ui.sidebar.agents]
+# rows = [
+#   ["state_icon", { token = "terminal_title_stripped", fg = "#cad3f5", bold = true }],
+#   [{ token = "workspace", fg = "#6e738d", bold = false }],
+# ]
+#
+# [ui.sidebar.agents.rows_by_agent]
+# claude = [["state_icon", { token = "agent", fg = "#cad3f5", bold = true }], [{ token = "workspace", fg = "#6e738d", bold = false }]]
+# pi = [["state_icon", { token = "agent", fg = "#cad3f5", bold = true }], [{ token = "workspace", fg = "#6e738d", bold = false }]]
+# ---------------------------------------------------------------------------
