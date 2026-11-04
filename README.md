@@ -67,19 +67,24 @@ port of ThePrimeagen's
 where each project becomes a herdr *workspace* rather than a tmux session.
 Requires `fzf` and `jq`. Bound to `f` in `zsh/zshrc`.
 
-## herdr navigation
+## herdr / rex navigation
 
 Seamless `Ctrl+h/j/k/l` between Neovim splits and herdr panes comes from
 [`vim-herdr-navigation`](https://github.com/paulbkim-dev/vim-herdr-navigation)
 (a port of `vim-tmux-navigator`). Two cooperating sides: a herdr plugin that
-forwards the chord into Vim or moves pane focus, and the Neovim maps loaded by
+forwards the chord into Vim or moves pane focus, and the Neovim maps in
 `nvim/lua/plugins/tmux-navigator.lua`.
 
-The keybindings live in the tracked `herdr/config.toml`. The Neovim side sources
-the checkout's `editor/nvim.lua` as the single source of truth — adjust the path
-in `nvim/lua/plugins/tmux-navigator.lua` if your checkout isn't at
-`~/projects/vim-herdr-navigation`. It falls back to tmux (`$TMUX`) or plain
-`wincmd` outside a herdr pane. Requires herdr `>= 0.7.0` and `jq`.
+The herdr keybindings live in the tracked `herdr/config.toml`. Rex mirrors the
+same chord natively (`rex/init.lua`): its action forwards `Ctrl+h/j/k/l` to Vim
+when a pane runs vim/nvim/vi, and otherwise moves Rex pane focus.
+
+The Neovim side is self-contained and tries, at a split edge, Rex first, then
+herdr, then tmux (`$TMUX`), then plain `wincmd`. Rex detection uses
+`$REX_SESSION`; focus crosses panes with `rex.session.focus_direction`, a
+server-side call that needs no Remote Control permission. herdr detection uses
+`$HERDR_PANE_ID` and `$HERDR_BIN_PATH`. Requires herdr `>= 0.7.0` and `jq` for
+the herdr path.
 
 ## Desktop / file manager
 
