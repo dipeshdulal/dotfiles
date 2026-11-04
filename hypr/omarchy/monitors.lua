@@ -17,13 +17,14 @@ hl.monitor({
 	scale = 1,
 })
 
--- Right: 1920x1080 rotated 270deg -> 1080x1920. Centred vertically against the
--- ultrawide's 1440px height: (1440 - 1920) / 2 = -240.
+-- Right: 1920x1080 rotated 270deg -> 1080x1920. Top-aligned with the
+-- ultrawide (y = 0), so it hangs 480px below rather than overhanging the top.
+-- For vertical centring use "3440x-240"; for bottom alignment "3440x-480".
 -- (transform: 0 = normal, 1 = 90deg, 2 = 180deg, 3 = 270deg.)
 hl.monitor({
 	output = "HDMI-A-1",
 	mode = "1920x1080@60",
-	position = "3440x-240",
+	position = "3440x0",
 	scale = 1,
 	transform = 3,
 })
