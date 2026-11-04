@@ -1,6 +1,6 @@
 # dotfiles
 
-Neovim, pi, herdr, tmux and zsh configuration, plus the Hyprland (DMS)
+Neovim, pi, herdr, rex, tmux and zsh configuration, plus the Hyprland (DMS)
 window/binding overrides and the desktop file-manager setup, symlinked into
 place by `install.sh`.
 
@@ -24,6 +24,7 @@ this repo. `git status` shows drift immediately; there is no sync step.
 | pi        | `pi/agent/`           | `~/.pi/agent/*` (per file)        |
 | skills    | `claude/skills/*`     | `~/.claude/skills/*`              |
 | herdr     | `herdr/config.toml`   | `~/.config/herdr/config.toml`     |
+| rex       | `rex/init.lua`        | `~/.config/rex/init.lua`          |
 | zsh       | `zsh/zshrc`           | `~/.zshrc`                        |
 | tmux      | `tmux/tmux.conf`      | `~/.tmux.conf`                    |
 | hypr      | `hypr/`               | `~/.config/hypr/…` (per file)     |

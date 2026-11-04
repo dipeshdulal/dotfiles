@@ -56,6 +56,9 @@ done
 echo "herdr"
 link herdr/config.toml "$HOME/.config/herdr/config.toml"
 
+echo "rex"
+link rex/init.lua "$HOME/.config/rex/init.lua"
+
 echo "zsh"
 link zsh/zshrc "$HOME/.zshrc"
 link zsh/p10k.zsh "$HOME/.p10k.zsh"
