@@ -27,7 +27,7 @@ this repo. `git status` shows drift immediately; there is no sync step.
 | rex       | `rex/init.lua`        | `~/.config/rex/init.lua`          |
 | zsh       | `zsh/zshrc`           | `~/.zshrc`                        |
 | tmux      | `tmux/tmux.conf`      | `~/.tmux.conf`                    |
-| hypr      | `hypr/`               | `~/.config/hypr/…` (per file)     |
+| hypr      | `hypr/`               | `~/.config/hypr/…` (per file, see below) |
 | desktop   | `desktop/`            | not symlinked; run `setup.sh`     |
 | bin       | `bin/`                | `~/.local/bin/`                   |
 
@@ -92,7 +92,23 @@ Files is **Nautilus** (GNOME Files) with **Sushi** for spacebar quick-look,
 replacing Dolphin. `desktop/setup.sh` installs the packages in
 `desktop/packages.txt` and points `inode/directory` at Nautilus.
 
-The Hyprland side is tracked under `hypr/`:
+The Hyprland side is tracked under `hypr/`, split by environment because the
+two machines need different things. `install.sh` picks a branch by testing for
+`/usr/share/omarchy`:
+
+**Omarchy** (`hypr/omarchy/`) — only the override files are linked; Omarchy
+keeps ownership of `hyprland.lua`, `input.lua`, `looknfeel.lua` and
+`autostart.lua`, so `omarchy refresh hyprland` can still reset those safely.
+
+- `hypr/omarchy/monitors.lua` — ultrawide on the left at 144 Hz, 1080p on the
+  right rotated to portrait (`transform = 1`), workspaces 1–5 on the ultrawide
+  and 6–10 on the portrait panel. Also sets `GDK_SCALE=1`, since the template
+  default of 2 double-scales GTK3 apps on 1x displays.
+- `hypr/omarchy/bindings.lua` — `SUPER+E` opens Nautilus; window focus moves to
+  `SUPER+HJKL` (which takes J/K/L back from toggle-split, the keybindings menu
+  and layout-toggle).
+
+**Bare Hyprland + DMS** (`hypr/`, the archtower setup):
 
 - `hypr/dms/binds-user.lua` — per-user DMS keybinds. `SUPER+E` opens
   `nautilus --new-window`; `SUPER+B` opens the default browser via

@@ -67,8 +67,17 @@ echo "tmux"
 link tmux/tmux.conf "$HOME/.tmux.conf"
 
 echo "hypr"
-link hypr/hyprland.lua       "$HOME/.config/hypr/hyprland.lua"
-link hypr/dms/binds-user.lua "$HOME/.config/hypr/dms/binds-user.lua"
+if [[ -d /usr/share/omarchy ]]; then
+  # Omarchy owns hyprland.lua and the rest of the defaults, so only our
+  # override files are linked. `omarchy refresh hyprland` restores the
+  # package versions if these ever need to be reset.
+  link hypr/omarchy/monitors.lua "$HOME/.config/hypr/monitors.lua"
+  link hypr/omarchy/bindings.lua "$HOME/.config/hypr/bindings.lua"
+else
+  # Bare Hyprland + DMS (the archtower setup).
+  link hypr/hyprland.lua       "$HOME/.config/hypr/hyprland.lua"
+  link hypr/dms/binds-user.lua "$HOME/.config/hypr/dms/binds-user.lua"
+fi
 
 echo "bin"
 link bin/herdr-sessionizer.sh "$HOME/.local/bin/herdr-sessionizer.sh"
