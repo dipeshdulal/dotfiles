@@ -44,8 +44,9 @@ o.bind(
 if o.cmd_present("omasnap") then
 	hl.unbind("PRINT")
 	hl.unbind("ALT + PRINT")
-	hl.unbind("SUPER + CTRL + PRINT")
 
+	-- SUPER+CTRL+PRINT (Omarchy's OCR text extraction) is deliberately left
+	-- bound: omasnap has no OCR, so unbinding it would lose that feature.
 	o.bind("PRINT", "Screenshot (omasnap)", "omasnap")
 	o.bind("CTRL + PRINT", "Fullscreen (omasnap)", "omasnap --capture-fullscreen")
 	o.bind("ALT + PRINT", "Window (omasnap)", "omasnap --capture-window")
